@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.MainActivity">
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/toolbar_menu"/>
+
+    <RadioGroup
+        android:id="@+id/rg_tab_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_white"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_dynamic"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/tab_menu_bottom_bitmap"
+            android:text="@string/tab_menu_dynamic" />
+
+        <RadioButton
+            android:id="@+id/rb_weather"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/tab_menu_bottom_bitmap"
+            android:text="@string/tab_menu_weather" />
+
+        <RadioButton
+            android:id="@+id/rb_news"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/tab_menu_bottom_bitmap"
+            android:text="@string/tab_menu_news" />
+
+        <RadioButton
+            android:id="@+id/rb_own"
+            style="@style/tab_menu_item"
+            android:drawableTop="@drawable/tab_menu_bottom_bitmap"
+            android:text="@string/tab_menu_own"/>
+
+    </RadioGroup>
+
+    <View
+        android:id="@+id/div_tab_bar"
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:layout_above="@id/rg_tab_bar"
+        android:background="@color/div_white" />
+
+    <FrameLayout
+        android:id="@+id/ly_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/div_tab_bar"
+        android:layout_below="@+id/include">
+
+    </FrameLayout>
+</RelativeLayout>

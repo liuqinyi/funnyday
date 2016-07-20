@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FunnyDay</string>
+    <string name="tab_menu_weather">天气</string>
+    <string name="tab_menu_news">资讯</string>
+    <string name="tab_menu_own">我</string>
+    <string name="tab_menu_dynamic">动态</string>
+    <string name="fragment_alter_text">暂时没有动态</string>
+
+</resources>
