@@ -1,28 +1,27 @@
 package application.lqy.com.funnyday.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.lqy.greendao.City;
-import com.lqy.greendao.Province;
-
-import java.util.List;
-
 import application.lqy.com.funnyday.R;
-import application.lqy.com.funnyday.db.WeatherDB;
-import application.lqy.com.funnyday.http.HttpUtil;
 import application.lqy.com.funnyday.model.dynamic.ui.DynamicFragment;
 import application.lqy.com.funnyday.model.news.NewsFragment;
 import application.lqy.com.funnyday.model.own.OwnFragment;
 import application.lqy.com.funnyday.model.weather.ui.WeatherFragment;
-import application.lqy.com.funnyday.util.AnalysisUtil;
+import application.lqy.com.funnyday.thread.HttpThread;
 
-public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener{
+public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener,View.OnClickListener{
 
     private static final String TAG = "MainActivity";
     private RadioGroup rg_tab_bar;
@@ -34,15 +33,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private NewsFragment newsFragment;
     private OwnFragment ownFragment;
     private FragmentManager fManager;
-
-    private HttpUtil httpUtil;
-
-    private WeatherDB weatherDB;
-
-    private AnalysisUtil analysisUtil;
-
-
-
+    private Toolbar toolbar;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,50 +47,21 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         rb_channel = (RadioButton) findViewById(R.id.rb_dynamic);
         rb_channel.setChecked(true);
 
-        saveCityToDb();
+        //创建网络请求子线程
+        HttpThread httpThread = new HttpThread(MainActivity.this);
+        Thread netHttp = new Thread(httpThread);
+        netHttp.start();
+
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        button = (Button)findViewById(R.id.btn_toolbar_choice_city);
+        if(button != null){
+            button.setOnClickListener(this);
+        }
+
+
 
     }
-
-    private synchronized void saveCityToDb() {
-        httpUtil = new HttpUtil(); //获取HttpUtil实例,访问网络数;
-        analysisUtil = new AnalysisUtil();
-        weatherDB = new WeatherDB(this);
-
-        new Thread(){
-//        WeatherDB weatherDB = WeatherDB.getInstance(MainActivity.this);  //获取weatherDB实例操作数据
-
-            @Override
-            public void run() {
-                super.run();
-                final String headerAddress = "http://www.weather.com.cn/data/list3/city";
-                final String provinceAddress = "http://www.weather.com.cn/data/list3/city.xml";
-                final String tailAddress = ".xml";
-                String provinceCode;
-                String cityCode;
-
-                String provinceResponse = httpUtil.get(provinceAddress);
-                Log.d(TAG, "获取全国省份代码" + provinceResponse );
-                analysisUtil.handleProvincesResponse(weatherDB,provinceResponse);
-
-                List<Province> provinces = weatherDB.loadProvince();
-                for (Province province : provinces){
-                    provinceCode = province.getProvince_code();
-                    String cityAddress = headerAddress+provinceCode+tailAddress;
-                    String cityResponse = httpUtil.get(cityAddress);
-                    analysisUtil.handlerCityResponse(weatherDB,cityResponse, Integer.parseInt(provinceCode));
-
-                    List<City> cityList = weatherDB.loadCity(Integer.parseInt(provinceCode));
-                    for(City city : cityList){
-                        cityCode = city.getCity_code();
-                        String countyAddress = headerAddress+cityCode+tailAddress;
-                        String countyResponse = httpUtil.get(countyAddress);
-                        analysisUtil.handlerCountiesRespose(weatherDB,countyResponse, Integer.parseInt(cityCode));
-                    }
-                }
-            }
-        }.start();
-    }
-
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -149,6 +112,25 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         if(ownFragment != null)fragmentTransaction.hide(ownFragment);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.weather_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_toolbar_choice_city:
+                Intent intent = new Intent(MainActivity.this,ChoiceCityActivity.class);
+
+                break;
+        }
+    }
 }
