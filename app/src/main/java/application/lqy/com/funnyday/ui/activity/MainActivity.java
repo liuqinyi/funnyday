@@ -8,6 +8,11 @@ import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.lqy.greendao.City;
+import com.lqy.greendao.Province;
+
+import java.util.List;
+
 import application.lqy.com.funnyday.R;
 import application.lqy.com.funnyday.db.WeatherDB;
 import application.lqy.com.funnyday.http.HttpUtil;
@@ -37,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private AnalysisUtil analysisUtil;
 
 
-    private static final String provinceAddress = "http://www.weather.com.cn/data/list3/city.xml";
 
 
     @Override
@@ -66,9 +70,31 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             @Override
             public void run() {
                 super.run();
-                String response = httpUtil.get(provinceAddress);
-                Log.d(TAG, "获取全国省份代码" + response );
-                analysisUtil.handleProvincesResponse(weatherDB,response);
+                final String headerAddress = "http://www.weather.com.cn/data/list3/city";
+                final String provinceAddress = "http://www.weather.com.cn/data/list3/city.xml";
+                final String tailAddress = ".xml";
+                String provinceCode;
+                String cityCode;
+
+                String provinceResponse = httpUtil.get(provinceAddress);
+                Log.d(TAG, "获取全国省份代码" + provinceResponse );
+                analysisUtil.handleProvincesResponse(weatherDB,provinceResponse);
+
+                List<Province> provinces = weatherDB.loadProvince();
+                for (Province province : provinces){
+                    provinceCode = province.getProvince_code();
+                    String cityAddress = headerAddress+provinceCode+tailAddress;
+                    String cityResponse = httpUtil.get(cityAddress);
+                    analysisUtil.handlerCityResponse(weatherDB,cityResponse, Integer.parseInt(provinceCode));
+
+                    List<City> cityList = weatherDB.loadCity(Integer.parseInt(provinceCode));
+                    for(City city : cityList){
+                        cityCode = city.getCity_code();
+                        String countyAddress = headerAddress+cityCode+tailAddress;
+                        String countyResponse = httpUtil.get(countyAddress);
+                        analysisUtil.handlerCountiesRespose(weatherDB,countyResponse, Integer.parseInt(cityCode));
+                    }
+                }
             }
         }.start();
     }

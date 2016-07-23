@@ -63,6 +63,7 @@ public class WeatherDB {
         return weatherDB;
     }*/
 
+    //保存省对象至数据库funnyday.db 表PROVINCE
     public void saveProvince(Province province){
         if(province != null){
             ProvinceDao provinceDao = getDaoSession().getProvinceDao();
@@ -70,21 +71,24 @@ public class WeatherDB {
         }
     }
 
-    public void savaCity(City city){
+    //保存市对象至数据库funnyday.db 表CITY
+    public void saveCity(City city){
         if(city != null){
             CityDao cityDao = getDaoSession().getCityDao();
             cityDao.insert(city);
         }
     }
 
-    public void savaCounty(County county){
+    //保存县对象至数据库funnyday,db 表COUNTY
+    public void saveCounty(County county){
         if(county != null){
             CountyDao countyDao = getDaoSession().getCountyDao();
             countyDao.insert(county);
         }
     }
 
-    public List<Province> loadProvice(){
+    //遍历省表，返回Province泛型集合
+    public List<Province> loadProvince(){
         List<Province> list = new ArrayList<Province>();
         ProvinceDao provinceDao = getDaoSession().getProvinceDao();
         Cursor cursor = getDb().query(provinceDao.getTablename(),provinceDao.getAllColumns(),null,null,null,null,null);
@@ -92,7 +96,42 @@ public class WeatherDB {
             do{
                 Province province = new Province();
                 province.setProvince_name(cursor.getString(cursor.getColumnIndex(ProvinceDao.Properties.Province_name.columnName)));
+                province.setProvince_code(cursor.getString(cursor.getColumnIndex(ProvinceDao.Properties.Province_code.columnName)));
                 list.add(province);
+            }while(cursor.moveToNext());
+        }
+        return list;
+    }
+
+    //遍历市表,返回City泛型集合
+    public List<City> loadCity(int provinceId){
+        List<City> list =  new ArrayList<>();
+        CityDao cityDao = getDaoSession().getCityDao();
+        Cursor cursor = getDb().query(cityDao.getTablename(),cityDao.getAllColumns(),null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            do{
+                City city = new City();
+                city.setCity_name(cursor.getString(cursor.getColumnIndex(CityDao.Properties.City_name.columnName)));
+                city.setCity_code(cursor.getString(cursor.getColumnIndex(CityDao.Properties.City_code.columnName)));
+                city.setProvince_id(provinceId);
+                list.add(city);
+            }while(cursor.moveToNext());
+        }
+        return list;
+    }
+
+    //遍历县表，返回County泛型集合
+    public List<County> loadCounty(int cityId){
+        List<County> list =  new ArrayList<>();
+        CountyDao countyDao = getDaoSession().getCountyDao();
+        Cursor cursor = getDb().query(countyDao.getTablename(),countyDao.getAllColumns(),null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            do{
+                County county = new County();
+                county.setCounty_name(cursor.getString(cursor.getColumnIndex(CountyDao.Properties.County_name.columnName)));
+                county.setCounty_code(cursor.getString(cursor.getColumnIndex(CountyDao.Properties.County_code.columnName)));
+                county.setCity_id(cityId);
+                list.add(county);
             }while(cursor.moveToNext());
         }
         return list;
