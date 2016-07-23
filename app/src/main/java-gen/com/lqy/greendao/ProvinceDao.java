@@ -24,7 +24,7 @@ public class ProvinceDao extends AbstractDao<Province, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Province_name = new Property(1, String.class, "province_name", false, "PROVINCE_NAME");
         public final static Property Province_code = new Property(2, String.class, "province_code", false, "PROVINCE_CODE");
-    }
+    };
 
 
     public ProvinceDao(DaoConfig config) {

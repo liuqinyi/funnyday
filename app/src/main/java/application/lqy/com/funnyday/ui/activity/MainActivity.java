@@ -4,17 +4,22 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import application.lqy.com.funnyday.R;
+import application.lqy.com.funnyday.db.WeatherDB;
+import application.lqy.com.funnyday.http.HttpUtil;
 import application.lqy.com.funnyday.model.dynamic.ui.DynamicFragment;
 import application.lqy.com.funnyday.model.news.NewsFragment;
 import application.lqy.com.funnyday.model.own.OwnFragment;
 import application.lqy.com.funnyday.model.weather.ui.WeatherFragment;
+import application.lqy.com.funnyday.util.AnalysisUtil;
 
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener{
 
+    private static final String TAG = "MainActivity";
     private RadioGroup rg_tab_bar;
     private RadioButton rb_channel;
 
@@ -24,6 +29,16 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private NewsFragment newsFragment;
     private OwnFragment ownFragment;
     private FragmentManager fManager;
+
+    private HttpUtil httpUtil;
+
+    private WeatherDB weatherDB;
+
+    private AnalysisUtil analysisUtil;
+
+
+    private static final String provinceAddress = "http://www.weather.com.cn/data/list3/city.xml";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +50,27 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         //获取第一个单选按钮，并设置其为选中状态
         rb_channel = (RadioButton) findViewById(R.id.rb_dynamic);
         rb_channel.setChecked(true);
+
+        saveCityToDb();
+
+    }
+
+    private synchronized void saveCityToDb() {
+        httpUtil = new HttpUtil(); //获取HttpUtil实例,访问网络数;
+        analysisUtil = new AnalysisUtil();
+        weatherDB = new WeatherDB(this);
+
+        new Thread(){
+//        WeatherDB weatherDB = WeatherDB.getInstance(MainActivity.this);  //获取weatherDB实例操作数据
+
+            @Override
+            public void run() {
+                super.run();
+                String response = httpUtil.get(provinceAddress);
+                Log.d(TAG, "获取全国省份代码" + response );
+                analysisUtil.handleProvincesResponse(weatherDB,response);
+            }
+        }.start();
     }
 
 
@@ -86,5 +122,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         if(newsFragment != null)fragmentTransaction.hide(newsFragment);
         if(ownFragment != null)fragmentTransaction.hide(ownFragment);
     }
+
+
 
 }
