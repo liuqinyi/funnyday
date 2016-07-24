@@ -4,7 +4,7 @@ package com.lqy.greendao;
 /**
  * Entity mapped to table COUNTY.
  */
-public class County {
+public class Country {
 
     private Long id;
     /** Not-null value. */
@@ -12,14 +12,14 @@ public class County {
     private String county_code;
     private Integer city_id;
 
-    public County() {
+    public Country() {
     }
 
-    public County(Long id) {
+    public Country(Long id) {
         this.id = id;
     }
 
-    public County(Long id, String county_name, String county_code, Integer city_id) {
+    public Country(Long id, String county_name, String county_code, Integer city_id) {
         this.id = id;
         this.county_name = county_name;
         this.county_code = county_code;

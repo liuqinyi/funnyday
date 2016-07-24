@@ -4,7 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.lqy.greendao.City;
-import com.lqy.greendao.County;
+import com.lqy.greendao.Country;
 import com.lqy.greendao.Province;
 
 import application.lqy.com.funnyday.db.WeatherDB;
@@ -65,12 +65,12 @@ public class AnalysisUtil {
             if (allCounties != null && allCounties.length > 0) {
                 for (String c : allCounties) {
                     String[] array = c.split("\\|");
-                    County county = new County();
-                    county.setId(null);
-                    county.setCounty_code(array[0]);
-                    county.setCounty_name(array[1]);
-                    county.setCity_id(cityId);
-                    weatherDB.saveCounty(county);
+                    Country country = new Country();
+                    country.setId(null);
+                    country.setCounty_code(array[0]);
+                    country.setCounty_name(array[1]);
+                    country.setCity_id(cityId);
+                    weatherDB.saveCounty(country);
                 }
                 return true;
             }

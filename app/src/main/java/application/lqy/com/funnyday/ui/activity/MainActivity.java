@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 
 import application.lqy.com.funnyday.R;
 import application.lqy.com.funnyday.model.dynamic.ui.DynamicFragment;
+import application.lqy.com.funnyday.model.lbs.ui.ChoiceCityActivity;
 import application.lqy.com.funnyday.model.news.NewsFragment;
 import application.lqy.com.funnyday.model.own.OwnFragment;
 import application.lqy.com.funnyday.model.weather.ui.WeatherFragment;
@@ -58,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         if(button != null){
             button.setOnClickListener(this);
         }
-
-
 
     }
 
@@ -129,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         switch (v.getId()){
             case R.id.btn_toolbar_choice_city:
                 Intent intent = new Intent(MainActivity.this,ChoiceCityActivity.class);
-
                 break;
         }
     }
+
 }

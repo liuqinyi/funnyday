@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.lqy.greendao.City;
 import com.lqy.greendao.CityDao;
-import com.lqy.greendao.County;
-import com.lqy.greendao.CountyDao;
+import com.lqy.greendao.Country;
+import com.lqy.greendao.CountryDao;
 import com.lqy.greendao.DaoMaster;
 import com.lqy.greendao.DaoSession;
 import com.lqy.greendao.Province;
@@ -80,10 +80,10 @@ public class WeatherDB {
     }
 
     //保存县对象至数据库funnyday,db 表COUNTY
-    public void saveCounty(County county){
-        if(county != null){
-            CountyDao countyDao = getDaoSession().getCountyDao();
-            countyDao.insert(county);
+    public void saveCounty(Country country){
+        if(country != null){
+            CountryDao countryDao = getDaoSession().getCountryDao();
+            countryDao.insert(country);
         }
     }
 
@@ -103,6 +103,33 @@ public class WeatherDB {
         return list;
     }
 
+    public String getCodeFormName(String name, int code, String higherCode){
+        switch(code){
+            case 0:
+                List<Province> provinceList = loadProvince();
+                for (Province province : provinceList){
+                    if (name == province.getProvince_name()){
+                        return province.getProvince_code();
+                    }
+                }
+                break;
+            case 1:
+                List<City> cityList = loadCity(Integer.parseInt(higherCode));
+                for(City city : cityList){
+                    if(name == city.getCity_name()){
+                        return city.getCity_code();
+                    }
+                }
+                break;
+            case 2:
+                List<Country> coutryList = loadCountry(Integer.parseInt(higherCode));
+
+                break;
+        }
+        return name;
+    }
+
+
     //遍历市表,返回City泛型集合
     public List<City> loadCity(int provinceId){
         List<City> list =  new ArrayList<>();
@@ -121,17 +148,17 @@ public class WeatherDB {
     }
 
     //遍历县表，返回County泛型集合
-    public List<County> loadCounty(int cityId){
-        List<County> list =  new ArrayList<>();
-        CountyDao countyDao = getDaoSession().getCountyDao();
-        Cursor cursor = getDb().query(countyDao.getTablename(),countyDao.getAllColumns(),null,null,null,null,null);
+    public List<Country> loadCountry(int cityId){
+        List<Country> list =  new ArrayList<>();
+        CountryDao countryDao = getDaoSession().getCountryDao();
+        Cursor cursor = getDb().query(countryDao.getTablename(), countryDao.getAllColumns(),null,null,null,null,null);
         if(cursor.moveToFirst()){
             do{
-                County county = new County();
-                county.setCounty_name(cursor.getString(cursor.getColumnIndex(CountyDao.Properties.County_name.columnName)));
-                county.setCounty_code(cursor.getString(cursor.getColumnIndex(CountyDao.Properties.County_code.columnName)));
-                county.setCity_id(cityId);
-                list.add(county);
+                Country country = new Country();
+                country.setCounty_name(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.County_name.columnName)));
+                country.setCounty_code(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.County_code.columnName)));
+                country.setCity_id(cityId);
+                list.add(country);
             }while(cursor.moveToNext());
         }
         return list;
