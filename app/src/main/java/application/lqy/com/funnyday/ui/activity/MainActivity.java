@@ -20,7 +20,6 @@ import application.lqy.com.funnyday.model.lbs.ui.ChoiceCityActivity;
 import application.lqy.com.funnyday.model.news.NewsFragment;
 import application.lqy.com.funnyday.model.own.OwnFragment;
 import application.lqy.com.funnyday.model.weather.ui.WeatherFragment;
-import application.lqy.com.funnyday.thread.HttpThread;
 
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener,View.OnClickListener{
 
@@ -48,14 +47,16 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         rb_channel = (RadioButton) findViewById(R.id.rb_dynamic);
         rb_channel.setChecked(true);
 
+/*
         //创建网络请求子线程
         HttpThread httpThread = new HttpThread(MainActivity.this);
         Thread netHttp = new Thread(httpThread);
         netHttp.start();
+*/
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        button = (Button)findViewById(R.id.btn_toolbar_choice_city);
+        //setSupportActionBar(toolbar);
+        button = (Button)findViewById(R.id.toolbar_btn);
         if(button != null){
             button.setOnClickListener(this);
         }
@@ -126,8 +127,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btn_toolbar_choice_city:
+            case R.id.toolbar_btn:
                 Intent intent = new Intent(MainActivity.this,ChoiceCityActivity.class);
+                startActivity(intent);
                 break;
         }
     }

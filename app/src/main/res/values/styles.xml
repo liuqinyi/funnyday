@@ -20,6 +20,7 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    //城市显示Text样式
     <style name="tv_region_name">
         <item name="android:textSize">30sp</item>
         <item name="android:layout_weight">1</item>

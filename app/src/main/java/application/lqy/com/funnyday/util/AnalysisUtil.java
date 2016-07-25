@@ -59,7 +59,7 @@ public class AnalysisUtil {
     }
 
     //解析根据市级代码获得县级县级代码
-    public static boolean handlerCountiesRespose(WeatherDB weatherDB, String response, int cityId){
+    public static boolean handlerCountiesResponse(WeatherDB weatherDB, String response, int cityId){
         if (!TextUtils.isEmpty(response)) {
             String[] allCounties = response.split(",");
             if (allCounties != null && allCounties.length > 0) {
@@ -67,10 +67,10 @@ public class AnalysisUtil {
                     String[] array = c.split("\\|");
                     Country country = new Country();
                     country.setId(null);
-                    country.setCounty_code(array[0]);
-                    country.setCounty_name(array[1]);
+                    country.setCountry_code(array[0]);
+                    country.setCountry_name(array[1]);
                     country.setCity_id(cityId);
-                    weatherDB.saveCounty(country);
+                    weatherDB.saveCountry(country);
                 }
                 return true;
             }

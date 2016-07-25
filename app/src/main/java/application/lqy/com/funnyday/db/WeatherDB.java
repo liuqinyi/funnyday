@@ -79,8 +79,8 @@ public class WeatherDB {
         }
     }
 
-    //保存县对象至数据库funnyday,db 表COUNTY
-    public void saveCounty(Country country){
+    //保存县对象至数据库funnyday,db 表country
+    public void saveCountry(Country country){
         if(country != null){
             CountryDao countryDao = getDaoSession().getCountryDao();
             countryDao.insert(country);
@@ -95,6 +95,7 @@ public class WeatherDB {
         if(cursor.moveToFirst()){
             do{
                 Province province = new Province();
+                province.setId(cursor.getLong(cursor.getColumnIndex(ProvinceDao.Properties.Id.columnName)));
                 province.setProvince_name(cursor.getString(cursor.getColumnIndex(ProvinceDao.Properties.Province_name.columnName)));
                 province.setProvince_code(cursor.getString(cursor.getColumnIndex(ProvinceDao.Properties.Province_code.columnName)));
                 list.add(province);
@@ -103,41 +104,19 @@ public class WeatherDB {
         return list;
     }
 
-    public String getCodeFormName(String name, int code, String higherCode){
-        switch(code){
-            case 0:
-                List<Province> provinceList = loadProvince();
-                for (Province province : provinceList){
-                    if (name == province.getProvince_name()){
-                        return province.getProvince_code();
-                    }
-                }
-                break;
-            case 1:
-                List<City> cityList = loadCity(Integer.parseInt(higherCode));
-                for(City city : cityList){
-                    if(name == city.getCity_name()){
-                        return city.getCity_code();
-                    }
-                }
-                break;
-            case 2:
-                List<Country> coutryList = loadCountry(Integer.parseInt(higherCode));
 
-                break;
-        }
-        return name;
-    }
+
 
 
     //遍历市表,返回City泛型集合
     public List<City> loadCity(int provinceId){
         List<City> list =  new ArrayList<>();
         CityDao cityDao = getDaoSession().getCityDao();
-        Cursor cursor = getDb().query(cityDao.getTablename(),cityDao.getAllColumns(),null,null,null,null,null);
+        Cursor cursor = getDb().query(cityDao.getTablename(),null,CityDao.Properties.Province_id.columnName+"=?",new String[]{String.valueOf(provinceId)},null,null,null);
         if(cursor.moveToFirst()){
             do{
                 City city = new City();
+                city.setId( cursor.getLong(cursor.getColumnIndex(CityDao.Properties.Id.columnName)));
                 city.setCity_name(cursor.getString(cursor.getColumnIndex(CityDao.Properties.City_name.columnName)));
                 city.setCity_code(cursor.getString(cursor.getColumnIndex(CityDao.Properties.City_code.columnName)));
                 city.setProvince_id(provinceId);
@@ -147,21 +126,23 @@ public class WeatherDB {
         return list;
     }
 
-    //遍历县表，返回County泛型集合
+    //遍历县表，返回country泛型集合
     public List<Country> loadCountry(int cityId){
         List<Country> list =  new ArrayList<>();
         CountryDao countryDao = getDaoSession().getCountryDao();
-        Cursor cursor = getDb().query(countryDao.getTablename(), countryDao.getAllColumns(),null,null,null,null,null);
+        Cursor cursor = getDb().query(countryDao.getTablename(), null,CountryDao.Properties.City_id.columnName+"=?",new String[]{String.valueOf(cityId)},null,null,null);
         if(cursor.moveToFirst()){
             do{
                 Country country = new Country();
-                country.setCounty_name(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.County_name.columnName)));
-                country.setCounty_code(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.County_code.columnName)));
+                country.setId(cursor.getLong(cursor.getColumnIndex(CountryDao.Properties.Id.columnName)));
+                country.setCountry_name(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.Country_name.columnName)));
+                country.setCountry_code(cursor.getString(cursor.getColumnIndex(CountryDao.Properties.Country_code.columnName)));
                 country.setCity_id(cityId);
                 list.add(country);
             }while(cursor.moveToNext());
         }
         return list;
     }
+
 
 }

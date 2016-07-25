@@ -57,7 +57,7 @@ public class HttpThread implements Runnable {
                 cityCode = city.getCity_code();
                 String countyAddress = headerAddress+cityCode+tailAddress;
                 String countyResponse = httpUtil.get(countyAddress);
-                analysisUtil.handlerCountiesRespose(weatherDB,countyResponse, Integer.parseInt(cityCode));
+                analysisUtil.handlerCountiesResponse(weatherDB,countyResponse, Integer.parseInt(cityCode));
             }
         }
     }
