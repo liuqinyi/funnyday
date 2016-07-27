@@ -1,4 +1,4 @@
-package com.lqy.funnyday.model.lbs.adapter;
+package com.lqy.funnyday.model.location.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -3,7 +3,7 @@ package com.lqy.funnyday.util;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.lqy.funnyday.db.WeatherDB;
+import com.lqy.funnyday.db.LocationDB;
 import com.lqy.greendao.City;
 import com.lqy.greendao.Country;
 import com.lqy.greendao.Province;
@@ -11,14 +11,20 @@ import com.lqy.greendao.Province;
 /**
  * Created by mrliu on 16-7-21.
  *
- * 数据解析类
+ * okhttp框架response解析类
  */
-public class AnalysisUtil {
+public class OkHttpResponseUtil {
 
-    private static final String TAG = "AnalysisUtil";
+    private static final String TAG = "OkHttpResponseUtil";
 
-    //解析获取的省级代码
-    public static boolean handleProvincesResponse(WeatherDB weatherDB, String response){
+
+    /**
+     * 解析
+     * response为市数据
+     * @param locationDB 需要存入的数据库对象
+     * @param response url返回市数据
+     * */
+    public synchronized static boolean handleProvincesResponse(LocationDB locationDB, String response){
         if (!TextUtils.isEmpty(response)){
             String[] allProvinces = response.split(",");
             if(allProvinces != null && allProvinces.length>0){
@@ -29,7 +35,7 @@ public class AnalysisUtil {
                     province.setProvince_code(array[0]);
                     province.setProvince_name(array[1]);
                     Log.d(TAG, "handleProvincesResponse: province: " + "name = " + province.getProvince_name()+",code = " + province.getProvince_code());
-                    weatherDB.saveProvince(province);
+                    locationDB.saveProvince(province);
                 }
                 return true;
             }
@@ -37,8 +43,14 @@ public class AnalysisUtil {
         return false;
     }
 
-    //解析根据省级代码获取的市级代码
-    public static boolean handlerCityResponse(WeatherDB weatherDB, String response, int provinceId){
+    /**
+     * 解析
+     * response为市数据
+     * @param locationDB 需要存入的数据库对象
+     * @param response:url 返回市数据
+     * @param provinceId:对应省代码，传入之后保存即可，不须处理逻辑
+     * */
+    public static boolean handlerCityResponse(LocationDB locationDB, String response, int provinceId){
         if (!TextUtils.isEmpty(response)) {
             String[] allCites = response.split(",");
             if (allCites != null && allCites.length > 0) {
@@ -49,7 +61,7 @@ public class AnalysisUtil {
                     city.setCity_code(array[0]);
                     city.setCity_name(array[1]);
                     city.setProvince_id(provinceId);
-                    weatherDB.saveCity(city);
+                    locationDB.saveCity(city);
                 }
                 return true;
             }
@@ -57,8 +69,14 @@ public class AnalysisUtil {
         return false;
     }
 
-    //解析根据市级代码获得县级县级代码
-    public static boolean handlerCountiesResponse(WeatherDB weatherDB, String response, int cityId){
+    /**
+     * 解析
+     * response为市数据
+     * @param locationDB 需要存入的数据库对象
+     * @param response:url 返回县数据
+     * @param cityId:对应市代码，传入之后保存即可，不须处理逻辑
+     * */
+    public static boolean handlerCountiesResponse(LocationDB locationDB, String response, int cityId){
         if (!TextUtils.isEmpty(response)) {
             String[] allCounties = response.split(",");
             if (allCounties != null && allCounties.length > 0) {
@@ -69,7 +87,7 @@ public class AnalysisUtil {
                     country.setCountry_code(array[0]);
                     country.setCountry_name(array[1]);
                     country.setCity_id(cityId);
-                    weatherDB.saveCountry(country);
+                    locationDB.saveCountry(country);
                 }
                 return true;
             }

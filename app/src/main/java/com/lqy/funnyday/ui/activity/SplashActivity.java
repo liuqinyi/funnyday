@@ -3,7 +3,8 @@ package com.lqy.funnyday.ui.activity;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.lqy.com.funnyday.R;
+import com.lqy.funnyday.R;
+
 
 /**
  * Created by mrliu on 16-7-21.

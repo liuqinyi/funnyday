@@ -9,19 +9,30 @@ import okhttp3.Response;
 /**
  * Created by mrliu on 16-7-21.
  */
-public class HttpUtil {
+public class HttpUtil implements Runnable{
     private static final String TAG = "HttpUtil";
 
+    private OkHttpClient okHttpClient;
+    private Request request;
+    private Response response;
+    private String result;
+
+
+    public HttpUtil(){
+
+    }
 
     //public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     //OkHttp 同步get()方法,响应值为String result
-    public String get(String url) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(url).build();
+    public String doGet(String url) {
+        this.okHttpClient = new OkHttpClient();
+        request = new Request.Builder().url(url).build();
+        return result;
+    }
 
-        Response response = null;
-        String result = null;
+    @Override
+    public void run() {
         try {
             response = okHttpClient.newCall(request).execute();
             if(!response.isSuccessful()) throw new IOException("Unexpected Code" + response);
@@ -29,7 +40,7 @@ public class HttpUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
+
     }
 
 /*

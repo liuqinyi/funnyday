@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.lqy.com.funnyday.R;
+import com.lqy.funnyday.R;
 import com.lqy.funnyday.model.dynamic.ui.DynamicFragment;
-import com.lqy.funnyday.model.lbs.ui.ChoiceCityActivity;
+import com.lqy.funnyday.model.location.ui.ChoiceCityActivity;
 import com.lqy.funnyday.model.news.NewsFragment;
 import com.lqy.funnyday.model.own.OwnFragment;
 import com.lqy.funnyday.model.weather.ui.WeatherFragment;
@@ -47,20 +47,12 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         rb_channel = (RadioButton) findViewById(R.id.rb_dynamic);
         rb_channel.setChecked(true);
 
-/*
-        //创建网络请求子线程
-        HttpThread httpThread = new HttpThread(MainActivity.this);
-        Thread netHttp = new Thread(httpThread);
-        netHttp.start();
-*/
-
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         button = (Button)findViewById(R.id.toolbar_btn);
         if(button != null){
             button.setOnClickListener(this);
         }
-
     }
 
     @Override

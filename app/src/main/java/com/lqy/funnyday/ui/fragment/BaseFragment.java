@@ -7,7 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.lqy.com.funnyday.R;
+import com.lqy.funnyday.R;
+
 
 /**
  * Created by mrliu on 16-7-18.

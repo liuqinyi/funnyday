@@ -18,14 +18,17 @@ import java.util.List;
 
 /**
  * Created by mrliu on 16-7-20.
+ *
+ * LocationDB 包含funnyday-db关于定位的PROVINCE,CITY,COUNTY表的存储，查询，字段添加等操作
  */
-public class WeatherDB {
+public class LocationDB {
 
-    private static WeatherDB weatherDB;
+    private static LocationDB locationDB;
     private DaoMaster.DevOpenHelper helper;
     private DaoMaster daomaster;
     private DaoSession daoSession;
     private SQLiteDatabase db;
+    private Context context;
 
 
     public DaoMaster getDaomaster() {
@@ -43,7 +46,8 @@ public class WeatherDB {
         return daoSession;
     }
 
-    public WeatherDB(Context context){
+    //创建LocationDB对象同时创建数据库
+    private LocationDB(Context context){
         //获取SQLiteOpenHelper对象,第二个参数位数据库名
         helper = new DaoMaster.DevOpenHelper(context,"funnyday-db",null);
         //获取SQLiteDatabase对象，创建数据库
@@ -55,13 +59,15 @@ public class WeatherDB {
         //通过daoSession对象实例化Province对象,curd(增删减查)操作也是通过该dao对象来操作
     }
 
+
+
     //获取WeatherDB对象,单例类，一次只能存在一个一个对象
-    /*public synchronized static WeatherDB getInstance(Context context){
-        if(weatherDB != null){
-            weatherDB = new WeatherDB(context);
+    public synchronized static LocationDB getInstance(Context context){
+        if(locationDB == null){
+            locationDB = new LocationDB(context);
         }
-        return weatherDB;
-    }*/
+        return locationDB;
+    }
 
     //保存省对象至数据库funnyday.db 表PROVINCE
     public void saveProvince(Province province){
@@ -79,7 +85,7 @@ public class WeatherDB {
         }
     }
 
-    //保存县对象至数据库funnyday,db 表country
+    //保存县对象至数据库funnyday.db 表country
     public void saveCountry(Country country){
         if(country != null){
             CountryDao countryDao = getDaoSession().getCountryDao();
@@ -103,10 +109,6 @@ public class WeatherDB {
         }
         return list;
     }
-
-
-
-
 
     //遍历市表,返回City泛型集合
     public List<City> loadCity(int provinceId){
@@ -143,6 +145,11 @@ public class WeatherDB {
         }
         return list;
     }
-
-
+    /**
+     * 清空数据库
+     * */
+    public void clearTable(String tableName){
+        getDb().execSQL("DELETE FROM "+tableName);
+        getDb().execSQL("UPDATE sqlite_sequence SET seq = 0 where name =\'"+tableName+"\'");
+    }
 }
