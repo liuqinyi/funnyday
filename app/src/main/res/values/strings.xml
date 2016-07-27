@@ -6,7 +6,6 @@
     <string name="tab_menu_dynamic">动态</string>
     <string name="fragment_alter_text">暂时没有动态</string>
     <string name="share">share</string>
-    <string name="toMmap">toMap</string>
     <string name="to_map">toMap</string>
 
 </resources>
