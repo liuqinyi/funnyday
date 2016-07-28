@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.lqy.com.funnyday.R;
 import com.lqy.funnyday.model.dynamic.ui.DynamicFragment;
@@ -21,20 +23,30 @@ import com.lqy.funnyday.model.news.NewsFragment;
 import com.lqy.funnyday.model.own.OwnFragment;
 import com.lqy.funnyday.model.weather.ui.WeatherFragment;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener,View.OnClickListener{
 
     private static final String TAG = "MainActivity";
-    private RadioGroup rg_tab_bar;
-    private RadioButton rb_channel;
-
-    //Fragment Object
+    private static boolean isExit = false; //双击退出
+    /**
+     * 声明Fragment对象
+     * */
     private DynamicFragment dynamicFragment;
     private WeatherFragment weatherFragment;
     private NewsFragment newsFragment;
     private OwnFragment ownFragment;
     private FragmentManager fManager;
+    /**
+     * UI组件
+     * */
+    private RadioGroup rg_tab_bar;
+    private RadioButton rb_channel;
     private Toolbar toolbar;
     private Button button;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +144,27 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 startActivity(intent);
                 break;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK){
+            Timer tExit;
+            if (isExit == false) {
+                isExit = true; // 准备退出
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                tExit = new Timer();
+                tExit.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        isExit = false; // 取消退出
+                    }
+                }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+            } else {
+                System.exit(0);
+            }
+        }
+        return false;
     }
 
 }
