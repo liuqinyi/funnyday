@@ -11,17 +11,20 @@
         android:icon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.lqy.funnyday.ui.activity.MainActivity">
+        <activity android:name="com.lqy.funnyday.ui.activity.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<<<<<<< HEAD
         <activity android:name="com.lqy.funnyday.model.location.ui.ChoiceCityActivity">
+=======
+        <activity android:name="com.lqy.funnyday.ui.activity.MainActivity">
+>>>>>>> splash
 
         </activity>
-        <activity android:name="com.lqy.funnyday.ui.activity.SplashActivity">
+        <activity android:name="com.lqy.funnyday.model.location.ui.ChoiceCityActivity">
 
         </activity>
     </application>
