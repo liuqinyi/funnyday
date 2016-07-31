@@ -15,17 +15,31 @@ import com.lqy.funnyday.R;
  */
 public class BaseFragment extends Fragment{
     private String label;
+    private BaseFragment baseFragment;
+
+    public BaseFragment(String label){
+        this.label = label;
+    }
 
     public BaseFragment(){}
 
-    public BaseFragment(String label) {
-        this.label = label;
+
+    public BaseFragment getInstance(String label) {
+        baseFragment = new BaseFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("label", label);
+        baseFragment.setArguments(bundle);
+        return baseFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fg_base,container,false);
         TextView txt_content = (TextView) view.findViewById(R.id.txt_content);
+        Bundle args = getArguments();
+        if (args != null){
+            this.label = args.getString("label");
+        }
         txt_content.setText(label);
         return view;
     }

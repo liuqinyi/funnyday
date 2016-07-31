@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         switch (checkedId){
             case R.id.rb_dynamic:
                 if(dynamicFragment == null){
-                    dynamicFragment = new DynamicFragment("动态\n暂无内容");
+                    dynamicFragment = DynamicFragment.getInstance("第一个Fragment");
                     fTransaction.add(R.id.ly_content, dynamicFragment);
                 }else{
                     fTransaction.show(dynamicFragment);
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 break;
             case R.id.rb_weather:
                 if(weatherFragment == null){
-                    weatherFragment = new WeatherFragment("第二个Fragment");
+                    weatherFragment = WeatherFragment.getInstance("WeatherFragment");
                     fTransaction.add(R.id.ly_content,weatherFragment);
                 }else{
                     fTransaction.show(weatherFragment);
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 break;
             case R.id.rb_news:
                 if(newsFragment == null){
-                    newsFragment = new NewsFragment("第三个Fragment");
+                    newsFragment = NewsFragment.getInstance("第三个Fragment");
                     fTransaction.add(R.id.ly_content,newsFragment);
                 }else{
                     fTransaction.show(newsFragment);
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 break;
             case R.id.rb_own:
                 if(ownFragment == null){
-                    ownFragment = new OwnFragment("第四个Fragment");
+                    ownFragment = OwnFragment.getInstance("第四个Fragment");
                     fTransaction.add(R.id.ly_content,ownFragment);
                 }else{
                     fTransaction.show(ownFragment);
@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                     }
                 }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
             } else {
+                finish();
                 System.exit(0);
             }
         }

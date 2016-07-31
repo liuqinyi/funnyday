@@ -2,50 +2,43 @@ package com.lqy.funnyday.model.weather.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.lqy.funnyday.R;
-import com.lqy.funnyday.ui.fragment.BaseFragment;
 
 /**
  * Created by mrliu on 16-7-18.
  */
-public class WeatherFragment extends BaseFragment{
-
-    private Toolbar toolbar;
-
-    private Button goChoiceWeatherActivity;
+public class WeatherFragment extends Fragment {
 
     private View view;
 
-    public WeatherFragment(){
-    }
+    private static WeatherFragment weatherFragment;
 
-    public WeatherFragment(String content){
-        super(content);
+    public static WeatherFragment getInstance(String label) {
+        weatherFragment = new WeatherFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("label", label);
+        weatherFragment.setArguments(bundle);
+        return weatherFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.view = inflater.inflate(R.layout.fg_layout_weather,null);
+        this.view = inflater.inflate(R.layout.fg_layout_weather, null);
+        TextView textView = (TextView) view.findViewById(R.id.tv_label);
+        Bundle bundle = getArguments();
+        textView.setText(bundle.getString("label"));
         return view;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initView();
-
     }
 
-    private void initView() {
-        /*toolbar = (Toolbar)this.view.findViewById(R.id.toolbar);
-        goChoiceWeatherActivity = (Button)view.findViewById(R.id.toolbar_btn);
-        Intent intent = new Intent(MyApplication.getContext(), ChoiceCityActivity.class);
-        startActivity(intent);*/
-    }
 }
