@@ -21,7 +21,6 @@
             style="@style/tv_region_name"/>
 
     </LinearLayout>
-    <include layout="@layout/divide_line"/>
     <ListView
         android:id="@+id/lv_city"
         android:layout_width="match_parent"

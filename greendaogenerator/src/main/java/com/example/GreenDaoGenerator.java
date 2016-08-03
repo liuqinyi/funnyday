@@ -29,10 +29,10 @@ public class GreenDaoGenerator {
         entity_city.addStringProperty("city_code");
         entity_city.addIntProperty("province_id");
 
-        Entity entity_county = schema.addEntity("County");
+        Entity entity_county = schema.addEntity("Country");
         entity_county.addIdProperty().autoincrement().primaryKey();
-        entity_county.addStringProperty("county_name").notNull();
-        entity_county.addStringProperty("county_code");
+        entity_county.addStringProperty("country_name").notNull();
+        entity_county.addStringProperty("country_code");
         entity_county.addIntProperty("city_id");
 
 

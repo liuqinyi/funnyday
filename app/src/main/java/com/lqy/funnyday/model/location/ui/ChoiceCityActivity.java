@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.db.LocationDB;
@@ -18,8 +20,13 @@ import com.lqy.greendao.City;
 import com.lqy.greendao.Country;
 import com.lqy.greendao.Province;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by mrliu on 16-7-23.
@@ -32,10 +39,11 @@ public class ChoiceCityActivity extends AppCompatActivity {
     private static final int LEVEL_PROVINCE = 0;
     private static final int LEVEL_CITY = 1;
     private static final int LEVEL_COUNTRY = 2;
+    private static final String TAG = "ChoiceActivity";
 
     /**
      * 组件
-     * */
+     */
     private ListView listView;
     private TextView tvProvince, tvCity, tvCountry; //地名显示
     private TextView toolbarTitle;
@@ -58,11 +66,12 @@ public class ChoiceCityActivity extends AppCompatActivity {
 
     private int currentLevel; //当前选中的级别
 
-    private ArrayAdapter<String> arrayAdapter; //创建一个基本数组适配器
-
-    private HttpUtil httpUtil; //okhttp网络请求
-
+    /**
+     * 工具类对象
+     */
+    private ArrayAdapter arrayAdapter; //创建一个基本数组适配器
     private LocationDB locationDB;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +94,9 @@ public class ChoiceCityActivity extends AppCompatActivity {
          * */
         locationDB = LocationDB.getInstance(this);
         dataList = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dataList); //实例化listView适配器
+
+        arrayAdapter = new ArrayAdapter(ChoiceCityActivity.this,android.R.layout.simple_list_item_1,dataList);
+        listView.setAdapter(arrayAdapter);
         queryProvinces();
         /**
          * listView设置监听器，更具同的等级响应不同事件
@@ -102,10 +113,12 @@ public class ChoiceCityActivity extends AppCompatActivity {
                 } else if (currentLevel == LEVEL_COUNTRY) {
                     selectedCountry = countryList.get(position);
                     tvCountry.setText(selectedCountry.getCountry_name());
+
                 }
             }
         });
     }
+
     /**
      * 查询全国所有省，的数据，先从数据库查询，如果没有再从服务器上查询
      */
@@ -124,6 +137,7 @@ public class ChoiceCityActivity extends AppCompatActivity {
             queryFromServer(null, "province");
         }
     }
+
     /**
      * 查询全国所有市的数据，先从数据库查询，如果没有再从服务器上查询
      */
@@ -142,6 +156,7 @@ public class ChoiceCityActivity extends AppCompatActivity {
             queryFromServer(selectedProvince.getProvince_code(), "city");
         }
     }
+
     /**
      * 查询全国所有县的数据，先从数据库查询，如果没有再从服务器上查询
      */
@@ -165,62 +180,97 @@ public class ChoiceCityActivity extends AppCompatActivity {
      * 如果数据没有导入数据库则从weather端口添加数据至数据库再回到主线程执行queryXXX()方法
      */
     private void queryFromServer(String code, final String type) {
-        String address;
-        String response;
+        final String address;
         boolean result = false;
         if (!TextUtils.isEmpty(code)) {
             address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
         } else {
-            address = "http://www.weather.com.cn/data/list3/city";
+            address = "http://www.weather.com.cn/data/list3/city.xml";
         }
+        //下载进度显示
         showProgressDialog();
-        httpUtil = new HttpUtil();
-        response = httpUtil.doGet(address);
-        if ("province".equals(type)) {
-            result = OkHttpResponseUtil.handleProvincesResponse(locationDB, response);
-        }else if ("city".equals(type)){
-            result = OkHttpResponseUtil.handlerCityResponse(locationDB,response, Integer.parseInt(selectedProvince.getProvince_code()));
-        }else if ("country".equals(type)){
-            result = OkHttpResponseUtil.handlerCountiesResponse(locationDB,response, Integer.parseInt(selectedCity.getCity_code()));
-        }
-        if (result){
-            //回到主线程处理逻辑
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    closeProgressDialog();
-                    if ("provider".equals(type)){
-                        queryProvinces();
-                    }else if ("city".equals(type)){
-                        queryCities();
-                    }else if ("country".equals(type)){
-                        queryCounties();
+        //开始加载数据,并通过callback回调在UI线程显示出来
+        HttpUtil.doAsynGet(address, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ChoiceCityActivity.this, "网络异常", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException{
+                boolean result = false;
+                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response); //判断响应
+                String myResponse = null;
+                try {
+                    myResponse = response.body().string();  //获取响应体
+                    Log.e(TAG, "onResponse: " + myResponse);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+                    if (response != null){
+                        response.close();
                     }
                 }
-            });
-        }
+                //将加载的数据保存至数据库
+                if ("province".equals(type)) {
+                    result = OkHttpResponseUtil.handleProvincesResponse(locationDB, myResponse);
+                } else if ("city".equals(type)) {
+                    result = OkHttpResponseUtil.handlerCityResponse(locationDB, myResponse, Integer.parseInt(selectedProvince.getProvince_code()));
+                } else if ("country".equals(type)) {
+                    result = OkHttpResponseUtil.handlerCountiesResponse(locationDB, myResponse, Integer.parseInt(selectedCity.getCity_code()));
+                }
+                if (result) {
+                    //回到主线程处理逻辑
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            closeProgressDialog();
+                            if ("province".equals(type)) {
+                                queryProvinces();
+                            } else if ("city".equals(type)) {
+                                queryCities();
+                            } else if ("country".equals(type)) {
+                                queryCounties();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+
     }
+
     /**
      * 显示进度条
-     * */
-    private void closeProgressDialog() {
-        if (progressDialog == null){
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("正在加载...");
-            progressDialog.setCanceledOnTouchOutside(false);
+     */
+    private void showProgressDialog() {
+        if (this.progressDialog == null) {
+            this.progressDialog = new ProgressDialog(ChoiceCityActivity.this);
+            this.progressDialog.setMessage("正在加载...");
+            this.progressDialog.setCanceledOnTouchOutside(false);
         }
+        this.progressDialog.show();
     }
+
     /**
      * 关闭进度条
-     * */
-    private void showProgressDialog() {
-        if (progressDialog != null){
+     */
+    private void closeProgressDialog() {
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
     }
 
     /**
-     * 捕获BACK键，根据当前等级判断，此时该返回省列表，市列表，还是直接退出*/
+     * 捕获BACK键，根据当前等级判断，此时该返回省列表，市列表，还是直接退出
+     */
     @Override
     public void onBackPressed() {
         if (currentLevel == LEVEL_COUNTRY) {

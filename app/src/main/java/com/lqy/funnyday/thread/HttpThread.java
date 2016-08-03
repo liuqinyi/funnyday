@@ -34,21 +34,21 @@ public class HttpThread implements Runnable {
         String provinceCode;
         String cityCode;
 
-        String provinceResponse = httpUtil.doGet(provinceAddress);
+        String provinceResponse = httpUtil.doSynGet(provinceAddress);
         okHttpResponseUtil.handleProvincesResponse(locationDB,provinceResponse);
 
         List<Province> provinces = locationDB.loadProvince();
         for (Province province : provinces){
             provinceCode = province.getProvince_code();
             String cityAddress = headerAddress+provinceCode+tailAddress;
-            String cityResponse = httpUtil.doGet(cityAddress);
+            String cityResponse = httpUtil.doSynGet(cityAddress);
             okHttpResponseUtil.handlerCityResponse(locationDB,cityResponse, Integer.parseInt(provinceCode));
 
             List<City> cityList = locationDB.loadCity(Integer.parseInt(provinceCode));
             for(City city : cityList){
                 cityCode = city.getCity_code();
                 String countyAddress = headerAddress+cityCode+tailAddress;
-                String countyResponse = httpUtil.doGet(countyAddress);
+                String countyResponse = httpUtil.doSynGet(countyAddress);
                 okHttpResponseUtil.handlerCountiesResponse(locationDB,countyResponse, Integer.parseInt(cityCode));
             }
         }

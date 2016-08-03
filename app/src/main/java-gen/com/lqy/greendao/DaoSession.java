@@ -20,7 +20,7 @@ public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig provinceDaoConfig;
     private final DaoConfig cityDaoConfig;
-    private final DaoConfig countyDaoConfig;
+    private final DaoConfig countryDaoConfig;
 
     private final ProvinceDao provinceDao;
     private final CityDao cityDao;
@@ -36,12 +36,12 @@ public class DaoSession extends AbstractDaoSession {
         cityDaoConfig = daoConfigMap.get(CityDao.class).clone();
         cityDaoConfig.initIdentityScope(type);
 
-        countyDaoConfig = daoConfigMap.get(CountryDao.class).clone();
-        countyDaoConfig.initIdentityScope(type);
+        countryDaoConfig = daoConfigMap.get(CountryDao.class).clone();
+        countryDaoConfig.initIdentityScope(type);
 
         provinceDao = new ProvinceDao(provinceDaoConfig, this);
         cityDao = new CityDao(cityDaoConfig, this);
-        countryDao = new CountryDao(countyDaoConfig, this);
+        countryDao = new CountryDao(countryDaoConfig, this);
 
         registerDao(Province.class, provinceDao);
         registerDao(City.class, cityDao);
@@ -51,7 +51,7 @@ public class DaoSession extends AbstractDaoSession {
     public void clear() {
         provinceDaoConfig.getIdentityScope().clear();
         cityDaoConfig.getIdentityScope().clear();
-        countyDaoConfig.getIdentityScope().clear();
+        countryDaoConfig.getIdentityScope().clear();
     }
 
     public ProvinceDao getProvinceDao() {
