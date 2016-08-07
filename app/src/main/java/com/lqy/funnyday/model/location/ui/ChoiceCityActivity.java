@@ -1,7 +1,10 @@
 package com.lqy.funnyday.model.location.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.db.LocationDB;
 import com.lqy.funnyday.http.HttpUtil;
+import com.lqy.funnyday.ui.activity.MainActivity;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
 import com.lqy.greendao.City;
 import com.lqy.greendao.Country;
@@ -114,6 +118,12 @@ public class ChoiceCityActivity extends AppCompatActivity {
                     selectedCountry = countryList.get(position);
                     tvCountry.setText(selectedCountry.getCountry_name());
 
+                    Intent intent = new Intent(ChoiceCityActivity.this, MainActivity.class);
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(ChoiceCityActivity.this).edit();
+                    editor.putString("county_code",selectedCountry.getCountry_code());
+                    intent.putExtra("county_code", selectedCountry.getCountry_code());
+                    startActivity(intent);
+                    finish();
                 }
             }
         });

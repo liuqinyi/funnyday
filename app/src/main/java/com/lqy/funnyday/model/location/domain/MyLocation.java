@@ -18,7 +18,7 @@ public class MyLocation {
     private String provider;
     private Context context;
 
-    public MyLocation(Context context){
+    public MyLocation(Context context) {
         this.context = context;
     }
 
@@ -31,6 +31,7 @@ public class MyLocation {
         criteria.setAltitudeRequired(false);
         criteria.setSpeedRequired(false);
         provider = locationManager.getBestProvider(criteria, false);
+
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -39,7 +40,6 @@ public class MyLocation {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-
         }
         location = locationManager.getLastKnownLocation(provider);
         return location;

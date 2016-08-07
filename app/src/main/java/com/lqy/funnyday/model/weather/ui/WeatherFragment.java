@@ -1,23 +1,47 @@
 package com.lqy.funnyday.model.weather.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lqy.funnyday.R;
+import com.lqy.funnyday.http.HttpUtil;
+import com.lqy.funnyday.util.OkHttpResponseUtil;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by mrliu on 16-7-18.
  */
 public class WeatherFragment extends Fragment {
 
-    private View view;
-
     private static WeatherFragment weatherFragment;
+    /**
+     * UI组件
+     * */
+    private View view;
+    private TextView tvCurrentTime, tvPublishTime, tvWeatherDesp, tvTemp;
+    private ImageView imgWeather;
+
+    private String countryCode;
+
+    private Context context;
+
+    private  SharedPreferences sharedPreferences;
 
     public static WeatherFragment getInstance(String label) {
         weatherFragment = new WeatherFragment();
@@ -30,15 +54,89 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fg_layout_weather, null);
-        TextView textView = (TextView) view.findViewById(R.id.tv_label);
-        Bundle bundle = getArguments();
-        textView.setText(bundle.getString("label"));
+        /**
+         * 实例化UI组件
+         * */
+        tvPublishTime = (TextView)view.findViewById(R.id.tv_publish_time);
+        tvCurrentTime = (TextView)view.findViewById(R.id.tv_current_time);
+        imgWeather = (ImageView)view.findViewById(R.id.imgv_weather);
+        tvWeatherDesp = (TextView)view.findViewById(R.id.tv_weather_desp);
+        tvTemp = (TextView)view.findViewById(R.id.tv_temp);
+
+        context = this.getActivity();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        countryCode = sharedPreferences.getString("country_code","");
+        initView();
         return view;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
+    private void initView() {
+        if (!TextUtils.isEmpty(countryCode)){
+            queryWeatherCode(countryCode);
+        }else{
+            showWeather();
+        }
+    }
+
+    private void queryWeatherCode(String countryCode) {
+        String address = "http://www.weather.com.cn/data/list3/city"+ countryCode +".xml";
+        queryFromServer(address, "countryCode");
+    }
+
+    private void queryWeatherInfo(String weatherCode){
+        String address = "http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
+        queryFromServer(address, "weatherCode");
+    }
+
+    private void queryFromServer(final String address, final String type) {
+        HttpUtil.doAsynGet(address, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Toast.makeText(context, "加载失败！", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) throw new IOException("响应回调出错" + response);
+                String result = response.body().string();
+                if ("countryCode".equals(type)){
+                    if (!TextUtils.isEmpty(result)){
+                        String[] array = result.split("\\|");
+                        if (array != null && array.length == 2){
+                            String weatherCode = array[1];
+                            queryWeatherInfo(weatherCode);
+                        }
+                    }
+                }else if ("weatherCode".equals(type)){
+                    OkHttpResponseUtil.handleWeatherResponse(context,result);
+                    showWeather();
+                }
+            }
+        });
+    }
+
+    private void showWeather(){
+        tvPublishTime.setText(sharedPreferences.getString("publish_time",""));
+        tvCurrentTime.setText(sharedPreferences.getString("current_time",""));
+        tvWeatherDesp.setText(sharedPreferences.getString("weather_desp",""));
+        tvTemp.setText(sharedPreferences.getString("temp1","") + " ~ " + sharedPreferences.getString("temp2",""));
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //countryCode = getIntent().getStringExtra("country_code");
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
 }
