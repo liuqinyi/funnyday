@@ -17,6 +17,13 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/tv_map"
+            android:text="MAP"
+            android:textSize="25dp"
+            android:layout_gravity="right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </android.support.v7.widget.Toolbar>
     <include layout="@layout/divide_line" />

@@ -1,6 +1,7 @@
 package com.lqy.funnyday.model.weather.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,12 +11,14 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.http.HttpUtil;
+import com.lqy.funnyday.model.map.BaiduMapActivity;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
 
 import java.io.IOException;
@@ -35,7 +38,9 @@ public class WeatherFragment extends Fragment {
      * */
     private View view;
     private TextView tvCurrentTime, tvPublishTime, tvWeatherDesp, tvTemp;
+    private TextView tvMap;
     private ImageView imgWeather;
+    private Button toolbarBtn;
 
     private String countryCode;
 
@@ -54,16 +59,25 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fg_layout_weather, null);
+        context = this.getActivity();
         /**
          * 实例化UI组件
          * */
+        toolbarBtn = (Button)view.findViewById(R.id.toolbar_btn);
         tvPublishTime = (TextView)view.findViewById(R.id.tv_publish_time);
         tvCurrentTime = (TextView)view.findViewById(R.id.tv_current_time);
         imgWeather = (ImageView)view.findViewById(R.id.imgv_weather);
         tvWeatherDesp = (TextView)view.findViewById(R.id.tv_weather_desp);
         tvTemp = (TextView)view.findViewById(R.id.tv_temp);
+        tvMap = (TextView)view.findViewById(R.id.tv_map);
+        tvMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, BaiduMapActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        context = this.getActivity();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         countryCode = sharedPreferences.getString("country_code","");
         initView();

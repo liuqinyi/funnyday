@@ -27,7 +27,7 @@ public class DynamicFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.view = inflater.inflate(R.layout.fg_layout_news, null);
+        this.view = inflater.inflate(R.layout.fg_layout_dynamic, null);
         TextView textView = (TextView) view.findViewById(R.id.tv_label);
         Bundle bundle = getArguments();
         textView.setText(bundle.getString("label"));
