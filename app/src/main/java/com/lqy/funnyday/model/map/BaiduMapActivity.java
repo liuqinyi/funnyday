@@ -18,9 +18,12 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.lqy.funnyday.R;
@@ -37,6 +40,7 @@ public class BaiduMapActivity extends AppCompatActivity {
     private BaiduMap baiduMap; //获取地图对象
     private String permissionInfo;
 
+
     /**
      * 定位相关
      */
@@ -44,7 +48,11 @@ public class BaiduMapActivity extends AppCompatActivity {
     private LocationClientOption mLocationClientOption;
     private MyLocationListener mLocationListener;
     private boolean isFirstLocation = true;
+    //申明两个描叙现在位置经纬度的double变量
+    private double mlatitude;
+    private double mlongitude;
 
+    private BitmapDescriptor mIconLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +76,10 @@ public class BaiduMapActivity extends AppCompatActivity {
     }
 
     private void initLocation() {
-        mLocationClient = new LocationClient(this);
         if (mLocationClient == null){
-            mLocationListener = new MyLocationListener();
+            mLocationClient = new LocationClient(this);
         }
+        mLocationListener = new MyLocationListener();
         mLocationClient.registerLocationListener(mLocationListener); //注册监听器
         //Location设置
         mLocationClientOption = new LocationClientOption();
@@ -81,8 +89,13 @@ public class BaiduMapActivity extends AppCompatActivity {
         mLocationClientOption.setScanSpan(1000); //设置请求时间间隔
         mLocationClient.setLocOption(mLocationClientOption);
 
+        mIconLocation = BitmapDescriptorFactory.fromResource(R.drawable.icon_openmap_focuse_mark);
     }
 
+    /**
+     * android 23专属获取权限
+     * very nice
+     */
     private void getPersimmions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ArrayList<String> permissions = new ArrayList<String>();
@@ -195,6 +208,9 @@ public class BaiduMapActivity extends AppCompatActivity {
                     item.setTitle("实时交通(ON)");
                 }
                 break;
+            case R.id.map_toMyLocation:
+                centerToMyLocation();
+                break;
         }
         return true;
     }
@@ -210,20 +226,29 @@ public class BaiduMapActivity extends AppCompatActivity {
                     .latitude(location.getLatitude()) //获取纬度
                     .longitude(location.getLongitude()) //获取经度
                     .build();
-            //MyLocationConfiguration myLocationConfig = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL,);
+            //添加方向覆盖物
+            MyLocationConfiguration myLocationConfig = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL,true,mIconLocation);
+            baiduMap.setMyLocationConfigeration(myLocationConfig);
 
             //向地图添加定位信息
             baiduMap.setMyLocationData(locationData);
+            //获取经纬度
+            mlatitude = location.getLatitude();
+            mlongitude = location.getLongitude();
 
             if (isFirstLocation){
-                LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude()); //获取当前经纬度并封装在latLng对象中
-                Log.d(TAG, "onReceiveLocation: latLng = " + latLng );
-                MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLng(latLng); //地图状态更新
-                baiduMap.setMapStatus(mapStatusUpdate); //跟踪到当前位置
+                centerToMyLocation();
                 isFirstLocation = false;
 
                 Toast.makeText(context,"我的位置："+ location.getAddrStr(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void centerToMyLocation() {
+        LatLng latLng = new LatLng(mlatitude, mlongitude); //获取当前经纬度并封装在latLng对象中
+        Log.d(TAG, "onReceiveLocation: latLng = " + latLng );
+        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLng(latLng); //地图状态更新
+        baiduMap.animateMapStatus(mapStatusUpdate); //跟踪到当前位置
     }
 }
