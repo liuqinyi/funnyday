@@ -11,37 +11,72 @@ import android.hardware.SensorManager;
  */
 public class MyDirectionSensorListener implements SensorEventListener {
 
-    private SensorManager sensorManager;
     private Context context;
+    /**
+     * 传感器相关
+     */
+    private SensorManager sensorManager;
     private Sensor sensor;
 
-    private float lastX;
+    /**
+     * 坐标相关
+     */
+    private float lastX; //x轴数据
+    private OnOrientationListener orientation; //通过接口对象回调坐标轴数据
 
-
-    public MyDirectionSensorListener(Context context){
+    public MyDirectionSensorListener(Context context) {
         this.context = context;
     }
 
-    public void start(){
-        sensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager != null){
+
+
+    public void setOrientation(OnOrientationListener orientation) {
+        this.orientation = orientation;
+    }
+
+    /**
+     * 开启方向传感器
+     */
+    public void start() {
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
             sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         }
-        if (sensor != null){
-            
+        if (sensor != null) {
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
         }
     }
 
-    public void stop(){
-
+    /**
+     * 关闭方向传感器
+     */
+    public void stop() {
+        sensorManager.unregisterListener(this);
     }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-
+        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+            float x = event.values[SensorManager.DATA_X];
+            if (Math.abs(x - lastX) > 1.0) {
+                if (orientation != null) {
+                    orientation.onOrientationChanged(x);
+                }
+            }
+            lastX = x;
+        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+        //精度改变
+    }
+
+    /**
+     * 设置回调的接口放回x轴数据
+     */
+    public interface OnOrientationListener {
+        void onOrientationChanged(float x);
     }
 }

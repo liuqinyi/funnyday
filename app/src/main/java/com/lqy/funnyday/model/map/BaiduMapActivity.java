@@ -23,8 +23,10 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.lqy.funnyday.R;
 
@@ -44,15 +46,25 @@ public class BaiduMapActivity extends AppCompatActivity {
     /**
      * 定位相关
      */
-    private LocationClient mLocationClient;
-    private LocationClientOption mLocationClientOption;
-    private MyLocationListener mLocationListener;
-    private boolean isFirstLocation = true;
+    private LocationClient mLocationClient; //定位客户端对象
+    private LocationClientOption mLocationClientOption; //定位设置对象
+    private MyLocationListener mLocationListener; //地位监听器，回调location
+    private boolean isFirstLocation = true; //判断是否是第一次初始化地图，用于寻找自己的位置
+    private MyDirectionSensorListener myDirectionSensorListener; //方向传感器监听器对象
+    private float mCurrentX; //现在的X轴坐标
+    private BitmapDescriptor mIconLocation; //定位图标
+
     //申明两个描叙现在位置经纬度的double变量
     private double mlatitude;
     private double mlongitude;
 
-    private BitmapDescriptor mIconLocation;
+    /**
+     * 添加覆盖物相关
+     *
+     */
+    private BitmapDescriptor mMarker;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +73,12 @@ public class BaiduMapActivity extends AppCompatActivity {
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_baidu_map);
         this.context = BaiduMapActivity.this;
-        mMapView = (MapView)findViewById(R.id.baimapView);
+        /**
+         * 初始化地图
+         */
+        mMapView = (MapView) findViewById(R.id.baimapView);
         baiduMap = mMapView.getMap();
-        baiduMap.setMyLocationEnabled(true);
+
 
 /*
         //用来控制地图现实比例
@@ -75,8 +90,11 @@ public class BaiduMapActivity extends AppCompatActivity {
         initLocation();
     }
 
+    /**
+     * 初始化定位
+     */
     private void initLocation() {
-        if (mLocationClient == null){
+        if (mLocationClient == null) {
             mLocationClient = new LocationClient(this);
         }
         mLocationListener = new MyLocationListener();
@@ -89,7 +107,25 @@ public class BaiduMapActivity extends AppCompatActivity {
         mLocationClientOption.setScanSpan(1000); //设置请求时间间隔
         mLocationClient.setLocOption(mLocationClientOption);
 
+        /**
+         * 定位及方向传感器
+         */
         mIconLocation = BitmapDescriptorFactory.fromResource(R.drawable.icon_openmap_focuse_mark);
+        myDirectionSensorListener = new MyDirectionSensorListener(this);
+        myDirectionSensorListener.setOrientation(new MyDirectionSensorListener.OnOrientationListener() {
+            @Override
+            public void onOrientationChanged(float x) {
+                mCurrentX = x;
+            }
+        });
+
+        initMarker();
+
+
+    }
+
+    private void initMarker() {
+        mMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_openmap_mark);
     }
 
     /**
@@ -109,8 +145,8 @@ public class BaiduMapActivity extends AppCompatActivity {
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
             }
-			/*
-			 * 读写权限和电话状态权限非必要权限(建议授予)只会申请一次，用户同意或者禁止，只会弹一次
+            /*
+             * 读写权限和电话状态权限非必要权限(建议授予)只会申请一次，用户同意或者禁止，只会弹一次
 			 */
             // 读写权限
             if (addPermission(permissions, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -130,14 +166,14 @@ public class BaiduMapActivity extends AppCompatActivity {
     @TargetApi(Build.VERSION_CODES.M)
     private boolean addPermission(ArrayList<String> permissionsList, String permission) {
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) { // 如果应用没有获得对应权限,则添加到列表中,准备批量申请
-            if (shouldShowRequestPermissionRationale(permission)){
+            if (shouldShowRequestPermissionRationale(permission)) {
                 return true;
-            }else{
+            } else {
                 permissionsList.add(permission);
                 return false;
             }
 
-        }else{
+        } else {
             return true;
         }
     }
@@ -148,9 +184,11 @@ public class BaiduMapActivity extends AppCompatActivity {
         //允许定位
         baiduMap.setMyLocationEnabled(true);
         //开启定位
-        if (!mLocationClient.isStarted()){
+        if (!mLocationClient.isStarted()) {
             mLocationClient.start();
         }
+        //开启方向传感器
+        myDirectionSensorListener.start();
     }
 
     @Override
@@ -160,6 +198,8 @@ public class BaiduMapActivity extends AppCompatActivity {
         baiduMap.setMyLocationEnabled(false);
         //停止定位
         mLocationClient.stop();
+        //关闭方向传感器
+        myDirectionSensorListener.stop();
     }
 
     @Override
@@ -174,6 +214,7 @@ public class BaiduMapActivity extends AppCompatActivity {
         //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
         mMapView.onResume();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -183,13 +224,13 @@ public class BaiduMapActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.map_menu,menu);
+        getMenuInflater().inflate(R.menu.map_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.map_commmon:
                 //普通地图
                 baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
@@ -200,10 +241,10 @@ public class BaiduMapActivity extends AppCompatActivity {
                 break;
             case R.id.map_traffic:
                 //实时交通
-                if (baiduMap.isTrafficEnabled()){
+                if (baiduMap.isTrafficEnabled()) {
                     baiduMap.setTrafficEnabled(false);
                     item.setTitle("实时交通（OFF）");
-                }else{
+                } else {
                     baiduMap.setTrafficEnabled(true);
                     item.setTitle("实时交通(ON)");
                 }
@@ -211,23 +252,36 @@ public class BaiduMapActivity extends AppCompatActivity {
             case R.id.map_toMyLocation:
                 centerToMyLocation();
                 break;
+            case R.id.map_addOverlay:
+                addOverlays();
         }
         return true;
     }
 
-    private class MyLocationListener implements BDLocationListener{
+    /**
+     * 添加覆盖物
+     */
+    private void addOverlays() {
+        baiduMap.clear();
+        LatLng latLng;
+        Marker marker;
+        OverlayOptions overlayOptions;
+
+    }
+
+    private class MyLocationListener implements BDLocationListener {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
             //通过回调获取定位信息
             MyLocationData locationData = new MyLocationData.Builder()
+                    .direction(mCurrentX) // .direction(100) // 此处设置开发者获取到的方向信息，顺时针0-360
                     .accuracy(location.getRadius()) //设置准确性，半径
-                   // .direction(100) // 此处设置开发者获取到的方向信息，顺时针0-360
                     .latitude(location.getLatitude()) //获取纬度
                     .longitude(location.getLongitude()) //获取经度
                     .build();
             //添加方向覆盖物
-            MyLocationConfiguration myLocationConfig = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL,true,mIconLocation);
+            MyLocationConfiguration myLocationConfig = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mIconLocation);
             baiduMap.setMyLocationConfigeration(myLocationConfig);
 
             //向地图添加定位信息
@@ -236,18 +290,18 @@ public class BaiduMapActivity extends AppCompatActivity {
             mlatitude = location.getLatitude();
             mlongitude = location.getLongitude();
 
-            if (isFirstLocation){
+            if (isFirstLocation) {
                 centerToMyLocation();
                 isFirstLocation = false;
 
-                Toast.makeText(context,"我的位置："+ location.getAddrStr(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "我的位置：" + location.getAddrStr(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void centerToMyLocation() {
         LatLng latLng = new LatLng(mlatitude, mlongitude); //获取当前经纬度并封装在latLng对象中
-        Log.d(TAG, "onReceiveLocation: latLng = " + latLng );
+        Log.d(TAG, "onReceiveLocation: latLng = " + latLng);
         MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLng(latLng); //地图状态更新
         baiduMap.animateMapStatus(mapStatusUpdate); //跟踪到当前位置
     }

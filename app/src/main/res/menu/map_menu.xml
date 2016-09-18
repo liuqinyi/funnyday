@@ -18,4 +18,8 @@
         android:id="@+id/map_toMyLocation"
         app:showAsAction="never"
         android:title="我的位置"/>
+    <item
+        android:id="@+id/map_addOverlay"
+        android:title="添加覆盖物"
+        app:showAsAction="never"/>
 </menu>
