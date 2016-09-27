@@ -118,10 +118,10 @@ public class ChoiceCityActivity extends AppCompatActivity {
                     selectedCountry = countryList.get(position);
                     tvCountry.setText(selectedCountry.getCountry_name());
 
-                    Intent intent = new Intent(ChoiceCityActivity.this, MainActivity.class);
+                    //将县级代码存至SharedPreferences中
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(ChoiceCityActivity.this).edit();
                     editor.putString("county_code",selectedCountry.getCountry_code());
-                    intent.putExtra("county_code", selectedCountry.getCountry_code());
+                    Intent intent = new Intent(ChoiceCityActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 }

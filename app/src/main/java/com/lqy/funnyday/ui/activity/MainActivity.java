@@ -1,6 +1,7 @@
 package com.lqy.funnyday.ui.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.lqy.funnyday.R;
+import com.lqy.funnyday.db.LocationDB;
 import com.lqy.funnyday.model.dynamic.ui.DynamicFragment;
 import com.lqy.funnyday.model.location.ui.ChoiceCityActivity;
 import com.lqy.funnyday.model.news.NewsFragment;
@@ -30,22 +32,22 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     private static final String TAG = "MainActivity";
     private static boolean isExit = false; //双击退出
-    /**
-     * 声明Fragment对象
-     * */
+
+    //Fragment对象
     private DynamicFragment dynamicFragment;
     private WeatherFragment weatherFragment;
     private NewsFragment newsFragment;
     private OwnFragment ownFragment;
     private FragmentManager fManager;
-    /**
-     * UI组件
-     * */
+
+    //UI组件
     private RadioGroup rg_tab_bar;
     private RadioButton rb_channel;
     private Toolbar toolbar;
     private Button button;
 
+    //数据
+    private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -65,6 +67,17 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         if(button != null){
             button.setOnClickListener(this);
         }
+
+        initData();
+    }
+
+    private void initData() {
+        initPreferences();
+    }
+
+    private void initPreferences() {
+        sharedPreferences = getSharedPreferences("cityCode",MODE_PRIVATE);
+        sharedPreferences.getString("cityCode", LocationDB.defaultCityCode);
     }
 
     @Override

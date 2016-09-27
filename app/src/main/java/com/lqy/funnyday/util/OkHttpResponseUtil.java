@@ -105,6 +105,11 @@ public class OkHttpResponseUtil {
         return false;
     }
 
+    /**
+     * 解析天禧信息返回值
+     * @param context
+     * @param response
+     */
     public static void handleWeatherResponse(Context context,String response){
         try{
             JSONObject jsonObject = new JSONObject(response);
@@ -118,13 +123,17 @@ public class OkHttpResponseUtil {
 
     }
 
+    /**
+     * 讲今夕玩的天禧信息存至Sharedpreference文件中
+     * @param context
+     * @param weatherInfo
+     */
     private static void saveWeatherInfoToSharePreferences(Context context, WeatherInfo weatherInfo) {
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyy年M月d日", Locale.CANADA);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected",true);
-        editor.putString("city_name" , weatherInfo.getCityName());
         editor.putString("weather_code" , weatherInfo.getWeatherCode());
+        editor.putString("city_name" , weatherInfo.getCityName());
         editor.putString("temp1" , weatherInfo.getTemp1());
         editor.putString("temp2" , weatherInfo.getTemp2());
         editor.putString("weather_desp" , weatherInfo.getWeatherDesp());

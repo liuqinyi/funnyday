@@ -33,20 +33,19 @@ import okhttp3.Response;
 public class WeatherFragment extends Fragment {
 
     private static WeatherFragment weatherFragment;
-    /**
-     * UI组件
-     * */
+    private Context context;
+
+    //UI组件
     private View view;
     private TextView tvCurrentTime, tvPublishTime, tvWeatherDesp, tvTemp;
     private TextView tvMap;
     private ImageView imgWeather;
     private Button toolbarBtn;
 
+    //当前城市代码
     private String countryCode;
-
-    private Context context;
-
-    private  SharedPreferences sharedPreferences;
+    //数据处理
+    private SharedPreferences sharedPreferences;
 
     public static WeatherFragment getInstance(String label) {
         weatherFragment = new WeatherFragment();
@@ -54,6 +53,11 @@ public class WeatherFragment extends Fragment {
         bundle.putString("label", label);
         weatherFragment.setArguments(bundle);
         return weatherFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
 
     @Override
@@ -98,16 +102,36 @@ public class WeatherFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
+    }
+
+    /**
+     * 根据城市代码查找天气代码
+     * @param countryCode
+     */
     private void queryWeatherCode(String countryCode) {
         String address = "http://www.weather.com.cn/data/list3/city"+ countryCode +".xml";
         queryFromServer(address, "countryCode");
     }
 
+    /**
+     * 根据天气代码查找天气信息
+     * @param weatherCode
+     */
     private void queryWeatherInfo(String weatherCode){
         String address = "http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
         queryFromServer(address, "weatherCode");
     }
 
+    /**
+     * 从服务器查找数据并解析
+     * @param address
+     * @param type
+     */
     private void queryFromServer(final String address, final String type) {
         HttpUtil.doAsynGet(address, new Callback() {
             @Override
@@ -143,14 +167,4 @@ public class WeatherFragment extends Fragment {
         tvTemp.setText(sharedPreferences.getString("temp1","") + " ~ " + sharedPreferences.getString("temp2",""));
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        //countryCode = getIntent().getStringExtra("country_code");
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 }

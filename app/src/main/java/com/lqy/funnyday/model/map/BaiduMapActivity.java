@@ -60,7 +60,6 @@ public class BaiduMapActivity extends AppCompatActivity {
 
     /**
      * 添加覆盖物相关
-     *
      */
     private BitmapDescriptor mMarker;
 

@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class LocationDB {
 
+    public static String defaultCityCode = "110000"; //北京市城市代码
     private static LocationDB locationDB;
     private DaoMaster.DevOpenHelper helper;
     private DaoMaster daomaster;

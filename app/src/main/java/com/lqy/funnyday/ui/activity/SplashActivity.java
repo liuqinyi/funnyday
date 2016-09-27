@@ -2,9 +2,9 @@ package com.lqy.funnyday.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -13,8 +13,10 @@ import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
 import com.lqy.funnyday.R;
-import com.lqy.funnyday.model.location.domain.MyLocation;
+import com.lqy.funnyday.util.PreferenceUtil;
 
 
 /**
@@ -22,18 +24,16 @@ import com.lqy.funnyday.model.location.domain.MyLocation;
  */
 public class SplashActivity extends Activity {
 
+    private static final String TAG = "SplashActivity";
     private ImageView imageView; //logo
     private AnimationSet animationSet; //动作设置对象
     private AlphaAnimation alphaAnimation; //淡入淡出动作对象
     private ScaleAnimation scaleAnimation; //旋转动作对象
 
-    /**
-     * 定位相关对象
-     */
-    private MyLocation myLocation;
-    private LocationManager locationManager;
-    private Location location;
-
+    //定位相关
+    private MyLocationListener myLocationListener;
+    //存储相关
+    private PreferenceUtil preferenceUtil;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +46,7 @@ public class SplashActivity extends Activity {
 
     private void init() {
         initAnimation();
+
     }
 
     private void initAnimation(){
@@ -62,7 +63,7 @@ public class SplashActivity extends Activity {
              */
             @Override
             public void onAnimationStart(Animation animation) {
-               locationService();
+               initService();
             }
 
             /**
@@ -84,12 +85,25 @@ public class SplashActivity extends Activity {
         });
     }
 
-    private void locationService(){
-       /* locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        myLocation =  new MyLocation(SplashActivity.this);
-        location = myLocation.getMyLocation(locationManager);
-        if (location == null){
-            Toast.makeText(SplashActivity.this, "无法定位", Toast.LENGTH_SHORT).show();
-        }*/
+    private void initService(){
+        initLocation();
     }
+
+    private void initLocation() {
+        myLocationListener = new MyLocationListener();
+    }
+
+    private class MyLocationListener implements BDLocationListener{
+
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            String cityCode = bdLocation.getCityCode();
+            String addressStr = bdLocation.getAddrStr();
+            Log.d(TAG, "onReceiveLocation: " + addressStr);
+            SharedPreferences weatherPreferences = getSharedPreferences("weatherPreferences",MODE_PRIVATE);
+            SharedPreferences.Editor editor = weatherPreferences.edit();
+            editor.putString("cityCode",cityCode);
+        }
+    }
+
 }
