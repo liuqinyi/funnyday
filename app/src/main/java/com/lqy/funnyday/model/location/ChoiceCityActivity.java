@@ -1,4 +1,4 @@
-package com.lqy.funnyday.model.location.ui;
+package com.lqy.funnyday.model.location;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.db.LocationDB;
-import com.lqy.funnyday.http.HttpUtil;
+import com.lqy.funnyday.util.HttpUtil;
 import com.lqy.funnyday.ui.activity.MainActivity;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
 import com.lqy.greendao.City;

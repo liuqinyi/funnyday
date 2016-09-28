@@ -1,4 +1,4 @@
-package com.lqy.funnyday.http;
+package com.lqy.funnyday.util;
 
 import java.io.IOException;
 

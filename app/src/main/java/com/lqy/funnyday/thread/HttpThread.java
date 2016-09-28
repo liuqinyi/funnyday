@@ -2,7 +2,7 @@ package com.lqy.funnyday.thread;
 
 import android.content.Context;
 
-import com.lqy.funnyday.http.HttpUtil;
+import com.lqy.funnyday.util.HttpUtil;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
 
 /**

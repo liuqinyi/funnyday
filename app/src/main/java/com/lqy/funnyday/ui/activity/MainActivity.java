@@ -19,10 +19,10 @@ import android.widget.Toast;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.model.dynamic.ui.DynamicFragment;
-import com.lqy.funnyday.model.location.ui.ChoiceCityActivity;
+import com.lqy.funnyday.model.location.ChoiceCityActivity;
 import com.lqy.funnyday.model.news.NewsFragment;
 import com.lqy.funnyday.model.own.OwnFragment;
-import com.lqy.funnyday.model.weather.ui.WeatherFragment;
+import com.lqy.funnyday.model.weather.WeatherFragment;
 
 import java.util.Timer;
 import java.util.TimerTask;

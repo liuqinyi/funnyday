@@ -1,24 +1,18 @@
 package com.lqy.funnyday.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.lqy.funnyday.db.LocationDB;
-import com.lqy.funnyday.model.weather.domain.WeatherInfo;
+import com.lqy.funnyday.model.weather.WeatherInfo;
 import com.lqy.greendao.City;
 import com.lqy.greendao.Country;
 import com.lqy.greendao.Province;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by mrliu on 16-7-21.
@@ -110,37 +104,19 @@ public class OkHttpResponseUtil {
      * @param context
      * @param response
      */
-    public static void handleWeatherResponse(Context context,String response){
+    public static void handleWeatherResponse(Context context, String response){
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONObject weatherJson = jsonObject.getJSONObject("weatherinfo");
             Gson gson = new Gson();
             WeatherInfo weatherInfo = gson.fromJson(String.valueOf(weatherJson),WeatherInfo.class);
-            saveWeatherInfoToSharePreferences(context,weatherInfo);
+            PreferenceUtil.saveWeatherInfoToSharePreferences(context,weatherInfo);
         }catch (JSONException e){
             e.printStackTrace();
         }
 
     }
 
-    /**
-     * 讲今夕玩的天禧信息存至Sharedpreference文件中
-     * @param context
-     * @param weatherInfo
-     */
-    private static void saveWeatherInfoToSharePreferences(Context context, WeatherInfo weatherInfo) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyy年M月d日", Locale.CANADA);
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putBoolean("city_selected",true);
-        editor.putString("weather_code" , weatherInfo.getWeatherCode());
-        editor.putString("city_name" , weatherInfo.getCityName());
-        editor.putString("temp1" , weatherInfo.getTemp1());
-        editor.putString("temp2" , weatherInfo.getTemp2());
-        editor.putString("weather_desp" , weatherInfo.getWeatherDesp());
-        editor.putString("publish_time",weatherInfo.getPtTime());
-        editor.putString("current_time",sdf.format(new Date()));
-        editor.commit();
-    }
 
 
 }

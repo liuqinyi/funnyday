@@ -1,4 +1,4 @@
-package com.lqy.funnyday.model.weather.domain;
+package com.lqy.funnyday.model.weather;
 
 /**
  * Created by mrliu on 16-8-3.

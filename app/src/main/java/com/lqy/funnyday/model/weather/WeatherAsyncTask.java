@@ -1,4 +1,4 @@
-package com.lqy.funnyday.model.weather.service;
+package com.lqy.funnyday.model.weather;
 
 import android.os.AsyncTask;
 

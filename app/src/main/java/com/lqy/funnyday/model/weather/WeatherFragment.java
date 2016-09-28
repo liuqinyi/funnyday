@@ -1,4 +1,4 @@
-package com.lqy.funnyday.model.weather.ui;
+package com.lqy.funnyday.model.weather;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,33 +6,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lqy.funnyday.R;
-import com.lqy.funnyday.http.HttpUtil;
 import com.lqy.funnyday.model.map.BaiduMapActivity;
-import com.lqy.funnyday.util.OkHttpResponseUtil;
 import com.lqy.funnyday.util.PreferenceUtil;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 /**
  * Created by mrliu on 16-7-18.
  */
-public class WeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment  {
 
     private static WeatherFragment weatherFragment;
+    private static final String TAG = "WeatherFragment";
     private Context context;
 
     //UI组件
@@ -75,14 +66,7 @@ public class WeatherFragment extends Fragment {
         tvWeatherDesp = (TextView) view.findViewById(R.id.tv_weather_desp);
         tvTemp = (TextView) view.findViewById(R.id.tv_temp);
         tvMap = (TextView) view.findViewById(R.id.tv_map);
-        tvMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, BaiduMapActivity.class);
-                startActivity(intent);
-            }
-        });
-        
+
         initView();
         return view;
     }
@@ -94,80 +78,28 @@ public class WeatherFragment extends Fragment {
     }
 
     private void initView() {
+        tvMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, BaiduMapActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        if (!TextUtils.isEmpty(currentCityCode)){
-            showWeather();
-        }else {
-            Toast.makeText(context, "为获取当前城市编号", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
         initSharedPreferences();
-
-
     }
 
     private void initSharedPreferences() {
-        sharedPreferences = context.getSharedPreferences("weatherPer", Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences(PreferenceUtil.NAME_WEATHER, Context.MODE_APPEND);
         currentCityCode = sharedPreferences.getString("cityCode", PreferenceUtil.cityCodeDefault);
+        showWeather();
     }
 
-    /**
-     * 根据城市代码查找天气代码
-     *
-     * @param countryCode
-     */
-    private void queryWeatherCode(String countryCode) {
-        String address = "http://www.weather.com.cn/data/list3/city" + countryCode + ".xml";
-        queryFromServer(address, "countryCode");
-    }
-
-    /**
-     * 根据天气代码查找天气信息
-     *
-     * @param weatherCode
-     */
-    private void queryWeatherInfo(String weatherCode) {
-        String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
-        queryFromServer(address, "weatherCode");
-    }
-
-    /**
-     * 从服务器查找数据并解析
-     *
-     * @param address
-     * @param type
-     */
-    private void queryFromServer(final String address, final String type) {
-        HttpUtil.doAsynGet(address, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                Toast.makeText(context, "加载失败！", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) throw new IOException("响应回调出错" + response);
-                String result = response.body().string();
-                if ("countryCode".equals(type)) {
-                    if (!TextUtils.isEmpty(result)) {
-                        String[] array = result.split("\\|");
-                        if (array != null && array.length == 2) {
-                            String weatherCode = array[1];
-                            queryWeatherInfo(weatherCode);
-                        }
-                    }
-                } else if ("weatherCode".equals(type)) {
-                    OkHttpResponseUtil.handleWeatherResponse(context, result);
-                    showWeather();
-                }
-            }
-        });
-    }
 
     private void showWeather() {
         tvPublishTime.setText(sharedPreferences.getString("publish_time", ""));

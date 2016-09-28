@@ -39,7 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".model.location.ui.ChoiceCityActivity" />
+        <activity android:name=".model.location.ChoiceCityActivity" />
         <activity android:name=".ui.activity.MainActivity" />
         <activity android:name=".model.map.BaiduMapActivity" />
 

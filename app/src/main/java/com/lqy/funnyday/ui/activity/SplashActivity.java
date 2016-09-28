@@ -13,6 +13,7 @@ import android.widget.ImageView;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.util.PreferenceUtil;
+import com.lqy.funnyday.util.WeatherInfoUtil;
 
 
 /**
@@ -28,11 +29,13 @@ public class SplashActivity extends Activity {
 
     //存储相关
     private PreferenceUtil preferenceUtil;
+    private WeatherInfoUtil weatherInfoUtil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
         init();
@@ -43,10 +46,10 @@ public class SplashActivity extends Activity {
 
     }
 
-    private void initAnimation(){
-        imageView = (ImageView)findViewById(R.id.imgV_logo);
+    private void initAnimation() {
+        imageView = (ImageView) findViewById(R.id.imgV_logo);
         animationSet = new AnimationSet(true);
-        alphaAnimation = new AlphaAnimation(0.1f,1.0f);
+        alphaAnimation = new AlphaAnimation(0.1f, 1.0f);
         alphaAnimation.setDuration(2000);
         animationSet.addAnimation(alphaAnimation);
         imageView.startAnimation(animationSet);
@@ -57,7 +60,7 @@ public class SplashActivity extends Activity {
              */
             @Override
             public void onAnimationStart(Animation animation) {
-               initService();
+                initService();
             }
 
             /**
@@ -67,7 +70,7 @@ public class SplashActivity extends Activity {
             @Override
             public void onAnimationEnd(Animation animation) {
                 Intent intent = new Intent();
-                intent.setClass(SplashActivity.this,MainActivity.class);
+                intent.setClass(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -79,14 +82,16 @@ public class SplashActivity extends Activity {
         });
     }
 
-    private void initService(){
-        initLocation();
+    private void initService() {
+        initData();
     }
 
-    private void initLocation() {
+    private void initData() {
         preferenceUtil = new PreferenceUtil(this);
-        String cityCode = null;
-        preferenceUtil.saveToPerference("weather","cityCode",cityCode);
+        weatherInfoUtil = new WeatherInfoUtil(this);
+        String cityCode = "010101";
+        preferenceUtil.saveToPreference(PreferenceUtil.NAME_WEATHER, PreferenceUtil.KEY_CITY_CODE, cityCode);
+        weatherInfoUtil.queryWeatherCode(cityCode); //通过城市代码，查询天气信息并将天气数据存入SharedPreference文件中
     }
 
 
