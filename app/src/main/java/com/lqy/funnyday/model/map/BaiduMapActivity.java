@@ -42,7 +42,6 @@ public class BaiduMapActivity extends AppCompatActivity {
     private BaiduMap baiduMap; //获取地图对象
     private String permissionInfo;
 
-
     /**
      * 定位相关
      */
@@ -63,6 +62,16 @@ public class BaiduMapActivity extends AppCompatActivity {
      */
     private BitmapDescriptor mMarker;
 
+    private String addressStr;
+
+    public String getAddressStr() {
+        return addressStr;
+    }
+
+    public void setAddressStr(String addressStr) {
+
+        this.addressStr = addressStr;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

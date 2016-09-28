@@ -18,7 +18,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.lqy.funnyday.R;
-import com.lqy.funnyday.db.LocationDB;
 import com.lqy.funnyday.model.dynamic.ui.DynamicFragment;
 import com.lqy.funnyday.model.location.ui.ChoiceCityActivity;
 import com.lqy.funnyday.model.news.NewsFragment;
@@ -72,13 +71,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     }
 
     private void initData() {
-        initPreferences();
     }
 
-    private void initPreferences() {
-        sharedPreferences = getSharedPreferences("cityCode",MODE_PRIVATE);
-        sharedPreferences.getString("cityCode", LocationDB.defaultCityCode);
-    }
+
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {

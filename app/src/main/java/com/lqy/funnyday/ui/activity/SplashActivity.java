@@ -2,9 +2,7 @@ package com.lqy.funnyday.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -13,8 +11,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.util.PreferenceUtil;
 
@@ -30,8 +26,6 @@ public class SplashActivity extends Activity {
     private AlphaAnimation alphaAnimation; //淡入淡出动作对象
     private ScaleAnimation scaleAnimation; //旋转动作对象
 
-    //定位相关
-    private MyLocationListener myLocationListener;
     //存储相关
     private PreferenceUtil preferenceUtil;
     @Override
@@ -90,20 +84,10 @@ public class SplashActivity extends Activity {
     }
 
     private void initLocation() {
-        myLocationListener = new MyLocationListener();
+        preferenceUtil = new PreferenceUtil(this);
+        String cityCode = null;
+        preferenceUtil.saveToPerference("weather","cityCode",cityCode);
     }
 
-    private class MyLocationListener implements BDLocationListener{
-
-        @Override
-        public void onReceiveLocation(BDLocation bdLocation) {
-            String cityCode = bdLocation.getCityCode();
-            String addressStr = bdLocation.getAddrStr();
-            Log.d(TAG, "onReceiveLocation: " + addressStr);
-            SharedPreferences weatherPreferences = getSharedPreferences("weatherPreferences",MODE_PRIVATE);
-            SharedPreferences.Editor editor = weatherPreferences.edit();
-            editor.putString("cityCode",cityCode);
-        }
-    }
 
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -20,6 +19,7 @@ import com.lqy.funnyday.R;
 import com.lqy.funnyday.http.HttpUtil;
 import com.lqy.funnyday.model.map.BaiduMapActivity;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
+import com.lqy.funnyday.util.PreferenceUtil;
 
 import java.io.IOException;
 
@@ -43,7 +43,7 @@ public class WeatherFragment extends Fragment {
     private Button toolbarBtn;
 
     //当前城市代码
-    private String countryCode;
+    private String currentCityCode;
     //数据处理
     private SharedPreferences sharedPreferences;
 
@@ -58,22 +58,23 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        this.context = this.getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fg_layout_weather, null);
-        context = this.getActivity();
+
         /**
          * 实例化UI组件
          * */
-        toolbarBtn = (Button)view.findViewById(R.id.toolbar_btn);
-        tvPublishTime = (TextView)view.findViewById(R.id.tv_publish_time);
-        tvCurrentTime = (TextView)view.findViewById(R.id.tv_current_time);
-        imgWeather = (ImageView)view.findViewById(R.id.imgv_weather);
-        tvWeatherDesp = (TextView)view.findViewById(R.id.tv_weather_desp);
-        tvTemp = (TextView)view.findViewById(R.id.tv_temp);
-        tvMap = (TextView)view.findViewById(R.id.tv_map);
+        toolbarBtn = (Button) view.findViewById(R.id.toolbar_btn);
+        tvPublishTime = (TextView) view.findViewById(R.id.tv_publish_time);
+        tvCurrentTime = (TextView) view.findViewById(R.id.tv_current_time);
+        imgWeather = (ImageView) view.findViewById(R.id.imgv_weather);
+        tvWeatherDesp = (TextView) view.findViewById(R.id.tv_weather_desp);
+        tvTemp = (TextView) view.findViewById(R.id.tv_temp);
+        tvMap = (TextView) view.findViewById(R.id.tv_map);
         tvMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,9 +82,7 @@ public class WeatherFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        countryCode = sharedPreferences.getString("country_code","");
+        
         initView();
         return view;
     }
@@ -95,40 +94,50 @@ public class WeatherFragment extends Fragment {
     }
 
     private void initView() {
-        if (!TextUtils.isEmpty(countryCode)){
-            queryWeatherCode(countryCode);
-        }else{
+
+        if (!TextUtils.isEmpty(currentCityCode)){
             showWeather();
+        }else {
+            Toast.makeText(context, "为获取当前城市编号", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        initSharedPreferences();
 
 
     }
 
+    private void initSharedPreferences() {
+        sharedPreferences = context.getSharedPreferences("weatherPer", Context.MODE_PRIVATE);
+        currentCityCode = sharedPreferences.getString("cityCode", PreferenceUtil.cityCodeDefault);
+    }
+
     /**
      * 根据城市代码查找天气代码
+     *
      * @param countryCode
      */
     private void queryWeatherCode(String countryCode) {
-        String address = "http://www.weather.com.cn/data/list3/city"+ countryCode +".xml";
+        String address = "http://www.weather.com.cn/data/list3/city" + countryCode + ".xml";
         queryFromServer(address, "countryCode");
     }
 
     /**
      * 根据天气代码查找天气信息
+     *
      * @param weatherCode
      */
-    private void queryWeatherInfo(String weatherCode){
-        String address = "http://www.weather.com.cn/data/cityinfo/"+weatherCode+".html";
+    private void queryWeatherInfo(String weatherCode) {
+        String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
         queryFromServer(address, "weatherCode");
     }
 
     /**
      * 从服务器查找数据并解析
+     *
      * @param address
      * @param type
      */
@@ -144,27 +153,27 @@ public class WeatherFragment extends Fragment {
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) throw new IOException("响应回调出错" + response);
                 String result = response.body().string();
-                if ("countryCode".equals(type)){
-                    if (!TextUtils.isEmpty(result)){
+                if ("countryCode".equals(type)) {
+                    if (!TextUtils.isEmpty(result)) {
                         String[] array = result.split("\\|");
-                        if (array != null && array.length == 2){
+                        if (array != null && array.length == 2) {
                             String weatherCode = array[1];
                             queryWeatherInfo(weatherCode);
                         }
                     }
-                }else if ("weatherCode".equals(type)){
-                    OkHttpResponseUtil.handleWeatherResponse(context,result);
+                } else if ("weatherCode".equals(type)) {
+                    OkHttpResponseUtil.handleWeatherResponse(context, result);
                     showWeather();
                 }
             }
         });
     }
 
-    private void showWeather(){
-        tvPublishTime.setText(sharedPreferences.getString("publish_time",""));
-        tvCurrentTime.setText(sharedPreferences.getString("current_time",""));
-        tvWeatherDesp.setText(sharedPreferences.getString("weather_desp",""));
-        tvTemp.setText(sharedPreferences.getString("temp1","") + " ~ " + sharedPreferences.getString("temp2",""));
+    private void showWeather() {
+        tvPublishTime.setText(sharedPreferences.getString("publish_time", ""));
+        tvCurrentTime.setText(sharedPreferences.getString("current_time", ""));
+        tvWeatherDesp.setText(sharedPreferences.getString("weather_desp", ""));
+        tvTemp.setText(sharedPreferences.getString("temp1", "") + " ~ " + sharedPreferences.getString("temp2", ""));
     }
 
 }
