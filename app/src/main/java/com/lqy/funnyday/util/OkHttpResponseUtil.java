@@ -100,16 +100,15 @@ public class OkHttpResponseUtil {
     }
 
     /**
-     * 解析天禧信息返回值
+     * 解析天禧信息返回值.
      * @param context
-     * @param response
+     * @param jsonObject
      */
-    public static void handleWeatherResponse(Context context, String response){
+    public static void handleWeatherResponse(Context context, JSONObject jsonObject){
         try{
-            JSONObject jsonObject = new JSONObject(response);
             JSONObject weatherJson = jsonObject.getJSONObject("weatherinfo");
             Gson gson = new Gson();
-            WeatherInfo weatherInfo = gson.fromJson(String.valueOf(weatherJson),WeatherInfo.class);
+            WeatherInfo weatherInfo = gson.fromJson(weatherJson.toString(),WeatherInfo.class);
             PreferenceUtil.saveWeatherInfoToSharePreferences(context,weatherInfo);
         }catch (JSONException e){
             e.printStackTrace();

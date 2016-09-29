@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.lqy.funnyday.R;
 import com.lqy.funnyday.db.LocationDB;
-import com.lqy.funnyday.util.HttpUtil;
+import com.lqy.funnyday.http.HttpUtil;
 import com.lqy.funnyday.ui.activity.MainActivity;
 import com.lqy.funnyday.util.OkHttpResponseUtil;
 import com.lqy.greendao.City;
@@ -223,9 +223,9 @@ public class ChoiceCityActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }finally {
-                    if (response != null){
+                   /* if (response != null){
                         response.close();
-                    }
+                    }*/
                 }
                 //将加载的数据保存至数据库
                 if ("province".equals(type)) {

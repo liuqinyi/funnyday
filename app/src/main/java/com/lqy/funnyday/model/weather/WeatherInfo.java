@@ -5,58 +5,44 @@ package com.lqy.funnyday.model.weather;
  */
 public class WeatherInfo {
 
-    private String cityName;
-    private String weatherCode;
+    private String city;
+    private String cityid;
     private String temp1;
     private String temp2;
-    private String weatherDesp;
-    private String ptTime;
+    private String weather;
+    private String img1;
+    private String img2;
+    private String ptime;
 
-    public String getCityName() {
-        return cityName;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setCityid(String cityid) {
+        this.cityid = cityid;
     }
 
-    public String getPtTime() {
-        return ptTime;
+    public void setImg1(String img1) {
+        this.img1 = img1;
     }
 
-    public void setPtTime(String ptTime) {
-        this.ptTime = ptTime;
+    public void setPtime(String ptime) {
+        this.ptime = ptime;
     }
 
-    public String getTemp1() {
-        return temp1;
+    public void setImg2(String img2) {
+        this.img2 = img2;
     }
 
     public void setTemp1(String temp1) {
         this.temp1 = temp1;
     }
 
-    public String getTemp2() {
-        return temp2;
-    }
-
     public void setTemp2(String temp2) {
         this.temp2 = temp2;
     }
 
-    public String getWeatherCode() {
-        return weatherCode;
-    }
-
-    public void setWeatherCode(String weatherCode) {
-        this.weatherCode = weatherCode;
-    }
-
-    public String getWeatherDesp() {
-        return weatherDesp;
-    }
-
-    public void setWeatherDesp(String weatherDesp) {
-        this.weatherDesp = weatherDesp;
+    public void setWeather(String weather) {
+        this.weather = weather;
     }
 }

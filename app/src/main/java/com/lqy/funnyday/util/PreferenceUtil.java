@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.lqy.funnyday.model.weather.WeatherInfo;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -57,15 +56,7 @@ public class PreferenceUtil {
         SimpleDateFormat sdf = new SimpleDateFormat("yyy年M月d日", Locale.CANADA);
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("city_selected", true);
-        editor.putString("weather_code", weatherInfo.getWeatherCode());
-        editor.putString("city_name", weatherInfo.getCityName());
-        editor.putString("temp1", weatherInfo.getTemp1());
-        editor.putString("temp2", weatherInfo.getTemp2());
-        editor.putString("weather_desp", weatherInfo.getWeatherDesp());
-        editor.putString("publish_time", weatherInfo.getPtTime());
-        editor.putString("current_time", sdf.format(new Date()));
-        editor.commit();
+
     }
 
 }
